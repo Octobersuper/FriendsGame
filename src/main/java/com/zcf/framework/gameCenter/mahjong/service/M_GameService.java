@@ -71,6 +71,7 @@ public class M_GameService {
             userBean.setLog_lat(map.get("log_lat"));
             // 加入座位
             roomBean.setUser_positions(userBean.getUserid());
+            userBean.setReady_state(0);
         } else {
             userBean.setDttype(map.get("fen"));
         }

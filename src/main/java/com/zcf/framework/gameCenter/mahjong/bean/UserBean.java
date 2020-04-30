@@ -78,7 +78,7 @@ public class UserBean {
 	private int number_3;
 	//大厅类型  2   4人场
 	private String dttype;
-	private int zha = 1;//扎针
+	private int zha;//扎针
 	private int fu;//辅分
 
 	public int getZha() {

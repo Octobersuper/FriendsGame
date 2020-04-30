@@ -796,6 +796,7 @@ public class RoomBean {
 			// 清空房间信息
 			Public_State.PKMap.remove(this.roomno);
 		} else {
+			this.zhanum = 0;
 			// 设置不平局
 			this.flow = 0;
 			// 设置准备阶段
@@ -810,7 +811,7 @@ public class RoomBean {
 			userBean.setReady_state(0);
 			userBean.setExit_game(0);
 			userBean.setFu(0);
-			userBean.setZha(1);
+			userBean.setZha(0);
 		}
 	}
 

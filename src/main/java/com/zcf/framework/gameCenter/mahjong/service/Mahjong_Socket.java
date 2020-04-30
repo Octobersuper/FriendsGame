@@ -139,7 +139,7 @@ public class Mahjong_Socket {
             returnMap.put("state", "0");
             if (roomBean != null && Public_State.PKMap.get(roomBean.getRoomno()) != null) {
                 // 重复创建
-                returnMap.put("state", "106"); 
+                returnMap.put("state", "106");
             } else {
                 // 创建房间
                 roomBean = gameService.Establish(jsonTo, userBean, Integer.parseInt(jsonTo.get("clubid")));
@@ -169,6 +169,7 @@ public class Mahjong_Socket {
                 if (roomBean == null) {
                     returnMap.put("state", "104");// 房间已满
                 } else {
+                    userBean.setReady_state(0);
                     // 将自己的信息推送给房间内其他玩家
                     userBean.getUser_Custom("userid-nickname-avatarurl-number-log_lat", returnMap);
                     roomBean.getRoomBean_Custom("user_positions", returnMap);
@@ -177,7 +178,7 @@ public class Mahjong_Socket {
                     returnMap.clear();
                     returnMap.put("state", "0");
                     returnMap.put("exittype", 1);
-                    roomBean.getRoomBean_Custom("roomno-max_person-user_positions-max_number-fen" +
+                    roomBean.getRoomBean_Custom("roomno-max_person-user_positions-max_number-fen-roomParams" +
                                     "-user_log", returnMap,
                             "userid-nickname-avatarurl-ready_state-log_lat-number-money");
                 }
@@ -202,7 +203,7 @@ public class Mahjong_Socket {
                     if (count == roomBean.getMax_person()) {
                         if(roomBean.getRoomParams().get("p4")!=0){
                             returnMap.put("type", "allReady");
-                            returnMap.put("banker", roomBean.getBanker());
+                            returnMap.put("fen", roomBean.getFen());
                         }else{
                             returnMap.put("type", "startgame");
                             returnMap.put("exittype", 3);
@@ -245,13 +246,13 @@ public class Mahjong_Socket {
             }
             userBean.setZha(zha);
             userBean.setFu(fu);
-            returnMap.put("state","0");
-            returnMap.put("type","zha_fu");
-            returnMap.put("userid",userBean.getUserid());
-            returnMap.put("zha",jsonTo.get("zha"));
-            returnMap.put("fu",fu);
-            sendMessageTo(returnMap);
-            sendMessageTo(returnMap,roomBean);
+            //returnMap.put("state","0");
+            //returnMap.put("type","zha_fu");
+            //returnMap.put("userid",userBean.getUserid());
+            //returnMap.put("zha",jsonTo.get("zha"));
+            //returnMap.put("fu",fu);
+            //sendMessageTo(returnMap);
+            //sendMessageTo(returnMap,roomBean);
             returnMap.clear();
             roomBean.setZhanum(roomBean.getZhanum()+1);
             roomBean.getLock().unlock();
@@ -264,6 +265,8 @@ public class Mahjong_Socket {
                     roomBean.getRoomBean_Custom("game_number-max_number-brands_count-banker-brands-fen", returnMap,
                             "brands-number-userid");
                 }
+                Random random = new Random();
+                returnMap.put("dice", random.nextInt(12) + 2);
                 sendMessageTo(returnMap);
                 sendMessageTo(returnMap,roomBean);
             }

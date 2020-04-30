@@ -351,6 +351,8 @@ public class F_WebSocket {
                     returnMap.put("state", state + "");
                     returnMap.put("type", "pk");
                     returnMap.put("userid", userBean.getUserid());
+                    returnMap.put("avatarurl", userBean.getAvatarurl());
+                    returnMap.put("pkavatarurl", pkBean.getUserBean(pkuserid).getAvatarurl());
                     returnMap.put("pkuserid", pkuserid);
                     returnMap.put("user_bets", userBean.getWinnum());
                     returnMap.put("money", userBean.getMoney());
