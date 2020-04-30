@@ -139,7 +139,7 @@ public class Mahjong_Socket {
             returnMap.put("state", "0");
             if (roomBean != null && Public_State.PKMap.get(roomBean.getRoomno()) != null) {
                 // 重复创建
-                returnMap.put("state", "106");
+                returnMap.put("state", "106"); 
             } else {
                 // 创建房间
                 roomBean = gameService.Establish(jsonTo, userBean, Integer.parseInt(jsonTo.get("clubid")));
