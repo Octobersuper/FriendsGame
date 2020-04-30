@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>发布可兑换商品</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<link rel="stylesheet" href="static/css/style.css">
+</head>
+<style>
+.roomType {
+	display: block !important;
+	width: 100%;
+	border-color: #D2D2D2 !important;
+	height: 20px;
+	line-height: 1.3;
+	border-width: 1px;
+	border-style: solid;
+	background-color: #fff;
+	border-radius: 2px;
+	padding-left: 10px;
+}
+
+.layui-btn {
+	margin-left: 180px;
+}
+</style>
+<body>
+	<div class="container">
+		<fieldset class="layui-elem-field layui-field-title"
+			style="margin-top: 20px;">
+			<legend>添加可兑换商品</legend>
+		</fieldset>
+		<form class="layui-form" action="">
+			<div class="layui-form-item">
+				<label class="layui-form-label">商品名称</label>
+				<div class="layui-input-block">
+					<input type="text" name="conname" lay-verify="conname"
+						autocomplete="off" placeholder="请输入商品名称"
+						class="layui-input conname" style="width:300px;">
+				</div>
+			</div>
+			<div class="layui-form-item">
+			    <label class="layui-form-label">商品类型</label>
+			    <div class="layui-input-inline">
+			      <select name="type" lay-filter="aihao">
+			        <option value="" selected=""></option>
+			        <option value="1">金币</option>
+			        <option value="2">钻石</option>
+			        <option value="3">其它</option>
+			      </select>
+			    </div>
+			  </div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">商品价值</label>
+				<div class="layui-input-block">
+					<input type="text" name="convalue" lay-verify="convalue"
+					onkeyup="value=zhzs(this.value)" 
+						autocomplete="off" placeholder="请输入商品价值（商品类型为其它时此处无效）"
+						class="layui-input convalue" style="width:300px;">
+
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">所需奖券</label>
+				<div class="layui-input-block">
+					<input type="text" name="connum" lay-verify="connum"
+						onkeyup="value=zhzs(this.value)" autocomplete="off"
+						placeholder="请输入所需奖券(单位/个)" class="layui-input connum"
+						style="width:300px;">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<button type="button" class="layui-btn" onclick="settijiao()">提交</button>
+				<button type="button" class="layui-btn" onclick="quxiao()">取消</button>
+			</div>
+			<div class="layui-form-item" style="color:#cccccc">注：商品类型为金币钻石时用户点击兑换可直接到账，其它类型(花费,红包等)需在兑换申请中处理。</div>
+		</form>
+	</div>
+
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script src="js/common.js"></script>
+	<script src="layui/layui.js"></script>
+	<script src="layer-v3.1.1/layer/mobile/layer.js"></script>
+	<script>
+		var form;
+		var layer;
+		$(function() {
+			layui.use([ 'form', 'element', 'layer' ], function() {
+				var form = layui.form
+				var $ = layui.jquery,
+					element = layui.element;
+				layer = layui.layer;
+			});
+		});
+		function quxiao() {
+			parent.layer.closeAll(); //关闭当前页面
+		}	
+
+		// 设置文本框只能输入数字
+		function zhzs(value) {
+			value = value.replace(/[^\d]/g, '');
+			if ('' != value) {
+				value = parseInt(value); //将形参转为整数
+			}
+			return value;
+		}
+		function settijiao() {
+			if ($(".conname").val() == null || $(".conname").val() == "" || $(".convalue").val() == null || $(".convalue").val() == ""|| $(".connum").val() == null || $(".connum").val() == ""
+			|| $("select[name='type']").siblings('.layui-unselect').children('dl').children("dd.layui-this").attr("lay-value") == null || $("select[name='type']").siblings('.layui-unselect').children('dl').children("dd.layui-this").attr("lay-value") == "" 
+			) {
+				layer.alert('请输入完整的商品信息!');
+			} else {
+				$.ajax({
+					type : "post",
+					url : baseurl + "/admin",
+					data : {
+						back : "addcon",
+						backuserid : localStorage.getItem("backuserid"),
+						conname : $(".conname").val(),
+						convalue : $(".convalue").val(),
+						 type : $("select[name='type']").siblings('.layui-unselect').children('dl').children("dd.layui-this").attr("lay-value"),
+						connum :  $(".connum").val()
+					},
+					success : function(data) {
+						if (data.state == "success") {
+							layer.alert('发布成功!', function() {
+								window.parent.location.reload();
+							});
+						} else if (data.state.state == 101) {
+							layer.alert('权限不足，发布失败!', function() {
+								window.parent.location.reload();
+							});
+						} else {
+							layer.alert("发布失败!", function() {
+								window.parent.location.reload();
+							});
+						}
+					}
+				});
+			}
+		}
+	</script>
+</body>
+</html>

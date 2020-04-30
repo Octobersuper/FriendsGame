@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>系统消息</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<link rel="stylesheet" href="static/css/style.css">
+<style>
+.img {
+	width: 92px;
+	height: 92px;
+	padding-left: 10px;
+}
+.color {
+	color: red;
+}
+
+.aa {
+	margin-left: 5px;
+}
+
+.layui-btnnum {
+	width: 40px;
+	margin-left: 4px;
+}
+.layui-btn {
+	margin-left: 180px;
+}
+</style>
+</head>
+<body>
+	<div class="container">
+		<fieldset class="layui-elem-field layui-field-title"
+			style="margin-top: 20px;">
+			<legend>发布系统消息</legend>
+		</fieldset>
+		<form class="layui-form" action="">
+			<div class="layui-form-item">
+				<label class="layui-form-label">标题</label>
+				<div class="layui-input-block">
+					<input type="text" name="title" lay-verify="title"
+						autocomplete="off" placeholder="请输入标题" class="layui-input title"
+						style="width:300px;">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">内容</label>
+				<div class="layui-input-block">
+					<textarea type="text" name="value" lay-verify="value"
+						autocomplete="off" placeholder="请输入内容" class="layui-input value"
+						style="width:300px; height: 150px;min-height: 100px;"></textarea>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<button type="button" class="layui-btn" onclick="settijiao()">提交</button>
+				<button type="button" class="layui-btn" onclick="quxiao()">取消</button>
+			</div>
+		</form>
+	</div>
+
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script src="js/common.js"></script>
+	<script src="layui/layui.js"></script>
+	<script src="layer-v3.1.1/layer/mobile/layer.js"></script>
+	<script>
+		var form;
+		var layer;
+		$(function() {
+			layui.use([ 'form', 'element', 'layer' ], function() {
+				var form = layui.form
+				var $ = layui.jquery,
+					element = layui.element;
+				layer = layui.layer;
+			});
+		});
+		function quxiao() {
+			parent.layer.closeAll(); //关闭当前页面
+		}
+		// 设置文本框只能输入数字
+		function zhzs(value) {
+			value = value.replace(/[^\d]/g, '');
+			if ('' != value) {
+				value = parseInt(value); //将形参转为整数
+			}
+			return value;
+		}
+		function settijiao() {
+			if ($(".value").val() == null || $(".value").val() == "" || $(".title").val() == null || $(".title").val() == "") {
+				layer.alert('请输入完整的系统信息!');
+			} else {
+				$.ajax({
+					type : "post",
+					url : baseurl + "/admin",
+					data : {
+						back : "adddisclaimer",
+						backuserid : localStorage.getItem("backuserid"),
+						title : $(".title").val(),
+						value : $(".value").val()
+					},
+					success : function(data) {
+						if (data.status== "success") {
+							layer.alert('发布成功!', function() {
+								window.parent.location.reload();
+							});
+						} else if (data.status.state == 101) {
+								layer.alert('权限不足，发布失败!', function() {
+								window.parent.location.reload();
+							});
+						} else {
+								layer.alert("发布失败!", function() {
+								window.parent.location.reload();
+							});
+						}
+					}
+				});
+			}
+		}
+	</script>
+</body>
+</html>

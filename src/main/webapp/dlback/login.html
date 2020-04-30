@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>广州麻将-登录</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<link rel="stylesheet" href="static/css/style.css">
+<style>
+html, body {
+	height: 100%
+}
+
+.layui-form {
+	position: absolute;
+	z-index: 2;
+	width: 100%;
+	top: 30%
+}
+
+.login {
+	margin-top: 0
+}
+
+</style>
+</head>
+
+<body style="background-color: #ddd; position: relative;"
+	class="layui-canvs">
+	<form class="layui-form" action="">
+		<div class="login">
+			<div class="layui-form-item">
+				<h2 class="tit">广州麻将代理管理系统</h2>
+			</div>
+			<div class="layui-form-item">
+				<select name="" id="role" lay-filter="myselect">
+					<option value="2">我是一级代理</option>
+					<option value="3">我是二级代理</option>
+				</select>
+			</div>
+			<div class="layui-form-item">
+				<input type="text" id="account" name="account" lay-verify="uname"
+					autocomplete="off" placeholder="请输入账号" class="layui-input">
+			</div>
+			<div class="layui-form-item">
+				<input type="password" id="pwd" name="pwd" lay-verify="pass"
+					autocomplete="off" placeholder="请输入密码" class="layui-input">
+			</div>
+			<div class="layui-form-item">
+				<button type="button" class="layui-btn layui-keydown" lay-submit=""
+					lay-filter="login" style="width:100%;">登录</button>
+			</div>
+		</div>
+	</form>
+	<script src="layui/layui.js"></script>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/common.js"></script>
+	<script src="js/jparticle.jquery.js"></script>
+	<script src="layer-v3.1.1/layer/mobile/layer.js"></script>
+	<script type="text/javascript">
+		$(function() {
+			console.log(document.body.offsetHeight)
+			$(".layui-canvs").jParticle({
+				background : 'black',
+				color : 'white',
+				linksWidth : 1.8
+			});
+		});
+	</script>
+
+	<script>
+		layui.use([ 'form', 'jquery' ], function() {
+			window.jQuery = window.$ = layui.jquery;
+			$(".layui-canvs").width($(window).width());
+			$(".layui-canvs").height($(window).height());
+			form = layui.form;
+			form.verify({
+				account : function(value) {
+					if (value == '') {
+						return '账号不能为空';
+					}
+				},
+				pwd : function(value) {
+					if (value == '') {
+						return '密码不能为空';
+					}
+				}
+			});
+			$(".layui-btn").click(function() {
+				var account = $("#account").val();
+				var pwd = $("#pwd").val();
+				if ($.trim(account) != "" && $.trim(pwd) != "") {
+					$.ajax({
+						type : "POST", //提交方式 
+						url : baseurl + "/admin	", //路径 
+						dataType : 'json',
+						data : {
+							back : "daililogin",
+							account : account,
+							pwd : pwd,
+							role : $("#role").val()
+						}, //数据，这里使用的是Json格式进行传输 
+						success : function(data) { //返回数据根据结果进行相应的处理 
+							if (data.data == 'null') {
+								alert("登录失败!请输入正确的账号或密码!");
+							} else {
+								localStorage.setItem("dlbackuserid", data.data.backuserid);
+								localStorage.setItem("dlbackname", data.data.backname);
+								localStorage.setItem("dlaccount", data.data.account);
+								localStorage.setItem("dlpassword", data.data.password);
+								localStorage.setItem("dlrole", data.data.role);
+								localStorage.setItem("dlmenuone", data.data.menuone);
+								localStorage.setItem("dlmenutwo", data.data.menutwo);
+								localStorage.setItem("dlmenuthree", data.data.menuthree);
+								localStorage.setItem("dlmenufour", data.data.menufour);
+								localStorage.setItem("dlmenufive", data.data.menufive);
+								localStorage.setItem("dlmenusix", data.data.menusix);
+								localStorage.setItem("dlmenuseven", data.data.menuseven);
+								localStorage.setItem("dlmenueight", data.data.menueight);
+								localStorage.setItem("dlmenunine", data.data.menunine);
+								localStorage.setItem("dlmenuten", data.data.menuten);
+								localStorage.setItem("dleleven", data.data.eleven);
+								localStorage.setItem("dltwelve", data.data.twelve);
+								window.location.href = "index.html";
+							}
+						}
+					});
+				}
+			}
+			)
+		});
+	</script>
+</body>
+</html>

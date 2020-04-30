@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>幸运转盘</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<link rel="stylesheet" href="static/css/style.css">
+<style>
+.layui-table-cell {
+	height: auto;
+}
+</style>
+<body>
+	<div class="container">
+		<form class="layui-form">
+			<table class="layui-hide" id="test"></table>
+			<script src="layui/layui.js" charset="utf-8"></script>
+			<table id="demo" lay-filter="test"></table>
+			<div id="test1"></div>
+			<script type="text/javascript" src="js/jquery.min.js"></script>
+			<script src="js/common.js"></script>
+			<script src="layui/layui.js"></script>
+			<script src="layer-v3.1.1/layer/mobile/layer.js"></script>
+			<script type="text/html" id="barDemo">
+				<a class="layui-btn layui-btn-xs" lay-event="update">修改</a>
+			</script>
+			<script>
+				var list;
+				var userType;
+				var vip;
+				var laypage;
+				$(function() { //入口
+					layui.use([ 'form', 'laypage' ], function() {
+						var form = layui.form;
+						laypage = layui.laypage;
+						userlist();
+					})
+				})
+				function userlist() {
+					$.ajax({
+						type : "GET", //提交方式 
+						url : baseurl + "/admin", //路径 
+						dataType : 'json',
+						data : {
+						backuserid:localStorage.getItem("backuserid"),
+							back : "getluckZ"
+						}, //数据，这里使用的是Json格式进行传输 
+						success : function(data) { //返回数据根据结果进行相应的处理 
+							console.log(data.list);
+							list = data.list;
+							layui.use('table', function() {
+								var table = layui.table;
+								//第一个实例
+								table.render({
+									elem : '#demo',
+									id : 'testReload',
+									data : list, //数据接口
+									cols : [
+										[ /* {
+											field : 'proid',
+											title : '转盘ID',
+											width : 100
+										},  */{
+											field : 'awardname',
+											title : '奖品名称',
+											width : 110
+										},{
+											field : 'type',
+											title : '奖品类型',
+											width : 110,
+											templet : "#typeTmp"
+										}, {
+											field : 'awardline',
+											title : '奖品价值',
+											width : 90
+										}, {
+											field : 'prop',
+											title : '选中概率',
+											width : 90,
+											templet : '<div><span>{{d.prop}}</span>%</div>'
+										},{
+											title : '操作',
+											width : 104,
+											align : 'center',
+											toolbar : '#barDemo'
+										} ]
+									]
+								});
+			
+								table.on('tool(test)', function(obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+									var data = obj.data; //获得当前行数据
+									var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+									var tr = obj.tr; //获得当前行 tr 的DOM对象
+									var proid = data.proid;
+									var prop = data.prop;
+									var awardline = data.awardline;
+									var awardname = data.awardname;
+									localStorage.setItem("proid", proid);
+									localStorage.setItem("prop", prop);
+									localStorage.setItem("awardline", awardline);
+									localStorage.setItem("awardname", awardname);
+									if (layEvent === 'update') {
+										layer.open({
+											type : 2,
+											title : '奖品修改',
+											maxmin : true,
+											shadeClose : false, //点击遮罩关闭层
+											area : [ '100%', '100%' ],
+											content : 'updprop.html?proid=' + proid
+										});
+									}
+								});
+							});
+						}
+					});
+				}
+			</script>
+			<script type="text/html" id="typeTmp">
+				{{# if (d.type === "1") { }}
+				<span>金币</span> 
+				{{# }else if(d.type === "2"){ }}
+				<span>钻石</span> 
+				{{# }else if(d.type === "3"){ }}
+				<span>实物</span>
+				{{# } else { }}
+				<span>大满贯</span> 
+				{{# } }}
+			</script>
+		 </form>
+		</div>
+</body>
+</html>

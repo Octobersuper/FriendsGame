@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>所有作品</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<link rel="stylesheet" href="static/css/style.css">
+<style>
+.layui-table-cell {
+	height: auto;
+}
+.layui-table-box, .layui-table-view {
+    width: 343px;
+}
+</style>
+</head>
+<body>
+	<div class="container">
+		<fieldset class="layui-elem-field layui-field-title"
+			style="margin-top: 20px;">
+			<legend>游戏统计</legend>
+		</fieldset>
+		<div class="layui-inline">
+			  <button data-method="setTop" class="layui-btn " id="addcon">查看充值统计</button>
+		</div>
+		<form class="layui-form">
+			<table class="layui-hide" id="test"></table>
+			<script src="layui/layui.js" charset="utf-8"></script>
+			<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+			<table id="demo" lay-filter="test"></table>
+			<div id="test1"></div>
+			<script type="text/javascript" src="js/jquery.min.js"></script>
+			<script src="js/common.js"></script>
+			<script src="layui/layui.js"></script>
+			<script src="layer-v3.1.1/layer/mobile/layer.js"></script>
+			<script>
+				var list;
+				var userType;
+				var laypage;
+				layui.use([ 'form', 'laypage', 'table', 'jquery' ], function() {
+					var table = layui.table;
+					var form = layui.form;
+					var $ = layui.jquery;
+					laypage = layui.laypage;
+					$(function() {
+						userlist();
+					},
+					$("#addcon").click(function() {
+							layer.open({
+								type : 2,
+								title : '充值统计',
+								maxmin : true,
+								shadeClose : false, //点击遮罩关闭层
+								area : [ '450px', '420px' ],
+								content : 'rechargeinfo.html'
+							});
+						})
+					)
+				})
+				function userlist() {
+					$.ajax({
+						type : "GET", //提交方式 
+						url : baseurl + "/admin?back=selectuser", //路径 
+						dataType : 'json',
+						data : {
+							backuserid : localStorage.getItem("backuserid")
+						}, //数据，这使用的是Json格式进行传输 
+						success : function(data) { //返回数据根据结果进行相应的处理 
+							if (data.list.state == 101) {
+									layer.msg("您没有访问权限!");
+								}
+							list = data.list;
+							layui.use('table', function() {
+								var table = layui.table;
+								//第一个实例
+								table.render({
+									elem : '#demo',
+									id : 'testReload',
+									data : list, //数据接口
+									cols : [
+										[ {
+											field : 'sumperson',
+											title : '总注册人数',
+											width : 170,
+											templet : '<div><span>{{d.sumperson}}</span>人</div>'
+										}, {
+											field : 'onlineperson',
+											title : '在线人数',
+											width : 170,
+											templet : '<div><span>{{d.onlineperson}}</span>人</div>'
+										} ]
+									]
+								});
+							});
+						}
+					});
+				}
+			</script>
+		</form>
+	</div>
+</body>
+</html>

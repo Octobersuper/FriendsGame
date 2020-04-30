@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>俱乐部管理</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<link rel="stylesheet" href="static/css/style.css">
+<style>
+.layui-table-cell {
+	height: auto;
+}
+.layui-table-box, .layui-table-view {
+    width: 455px;
+}
+</style>
+<body>
+	<div class="container">
+		<fieldset class="layui-elem-field layui-field-title"
+			style="margin-top: 20px;">
+			<legend>查看俱乐部成员</legend>
+		</fieldset>
+		<form class="layui-form">
+			<table class="layui-hide" id="test"></table>
+			<script src="layui/layui.js" charset="utf-8"></script>
+			<table id="demo" lay-filter="test"></table>
+			<div id="test1"></div>
+			<script type="text/javascript" src="js/jquery.min.js"></script>
+			<script src="js/common.js"></script>
+			<script src="layui/layui.js"></script>
+			<script src="layer-v3.1.1/layer/mobile/layer.js"></script>
+
+			<script>
+				var list;
+				var userType;
+				var vip;
+				var laypage;
+				layui.use([ 'form', 'laypage', 'layer' ], function() {
+					var form = layui.form;
+					var $ = layui.jquery;
+					layer = layui.layer; //独立版的layer无需执行这一句
+					laypage = layui.laypage;
+					$(function() {
+						userlist();
+					}
+					)
+				})
+			
+				function userlist() {
+					$.ajax({
+						type : "GET", //提交方式 
+						url : baseurl + "/admin", //路径 
+						dataType : 'json',
+						data : {
+							back : "lookCircle",
+							circlenumber : localStorage.getItem("circlenumber")
+						}, //数据，这里使用的是Json格式进行传输 
+						success : function(data) { //返回数据根据结果进行相应的处理 
+						if (data.list.state == 101) {
+									layer.msg("您没有访问权限!");
+								}
+							list = data.list;
+							layui.use('table', function() {
+								var table = layui.table;
+								//第一个实例
+								table.render({
+									elem : '#demo',
+									id : 'testReload',
+									data : list, //数据接口
+									cols : [
+										[  {
+											field : 'userid',
+											title : '玩家ID',
+											width : 100
+										}, {
+											field : 'nickname',
+											title : '玩家昵称',
+											width : 90
+										}, {
+											field : 'diamond',
+											title : '房卡数量',
+											width : 100
+										},{
+											field : 'date',
+											title : '加入时间',
+											width : 160
+										} ]
+									]
+								});
+							});
+						}
+					});
+				}
+			</script>
+		</form>
+	</div>
+</body>
+</html>

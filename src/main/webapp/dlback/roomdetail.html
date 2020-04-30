@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+	
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>所有作品</title>
+		<link rel="stylesheet" href="layui/css/layui.css">
+		<link rel="stylesheet" href="static/css/style.css">
+		<style>
+			.layui-table-cell {
+				height: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+
+			<form class="layui-form" >
+			<table class="layui-hide"  id="test"></table>
+			<script src="layui/layui.js" charset="utf-8"></script>
+			<table id="demo" lay-data="{height: 'full-200', cellMinWidth: 80}"  lay-filter="test"></table>
+			<div id="test1"></div>
+				<div class="layui-form-item">
+					<button type="button" class="layui-btn layui-btn-danger" id="update">点击刷新</button>
+				</div>
+			<div class="container">
+				<div class="layui-form-item">
+					<h1 style="color:red">1. 请配合房间内玩家进行操作!</h1>
+				</div>
+			<div class="layui-form-item">
+				<h1 style="color:red">2. 指定下一张摸牌前请先点击上方刷新按钮,其它时刻请勿点击!</h1>
+			</div>
+			<div class="layui-form" >
+			  <table id="brands" class="layui-table containers">			    
+			  </table>
+			</div>
+		</div>			
+			<script type="text/javascript" src="js/jquery.min.js"></script>
+			<script src="js/common.js"></script>
+			<script src="layui/layui.js"></script>
+			<script src="layer-v3.1.1/layer/mobile/layer.js"></script>
+			<script>
+				var list;
+				var userType;
+				var vip;
+				var laypage;
+				$(function() {
+					layui.use(['form', 'laypage'], function() {
+						var form = layui.form;
+						laypage = layui.laypage;
+						userlist();
+					})
+				})
+				
+				$("#update").click(function() {
+				window.location.reload();
+				})
+				
+				function userlist() {
+				 var roomo=localStorage.getItem("roomo")			
+					$.ajax({
+						type: "POST", //提交方式 
+						url: baseurl + "/admin", //路径 
+						dataType: 'json',
+						data: {
+							roomo : roomo,
+							back:"getrecorduser"
+						}, //数据，这里使用的是Json格式进行传输 
+						success: function(data) { //返回数据根据结果进行相应的处理
+							setBrand(data.brands) 
+							list = data.list;
+							layui.use('table', function() {
+								var table = layui.table;
+								//第一个实例
+								table.render({
+									elem: '#demo',
+									id: 'testReload',
+									data: list, //数据接口
+									cols: [
+										[{
+											field: 'nickname',
+											title: '玩家名称',
+											width: 110
+										}, {
+											field: 'brand',
+											title: '玩家当前手中的牌',
+											width: 659
+										}, {
+											field: 'game_number',
+											title: '当前局数',
+											width: 120
+										}]
+									]
+								});
+							});
+						}
+					});
+				}
+				//加载剩余的牌
+				function setBrand(brands){
+					//var indexs = brands.split(",");
+					for(var i=0;i<brands.length;i++){
+					var html = "<img id='"+brands[i]+"' onclick='onkey("+brands[i]+")' src='"+baseurl+"/img/"+brands[i]+".png' width='40px' height='50px' />"
+						$("#brands").html($("#brands").html()+html);
+					}
+				}
+				function onkey(index){
+				 var roomo=localStorage.getItem("roomo")		
+					$.ajax({
+						type: "POST", //提交方式 
+						url: baseurl + "/admin", //路径 
+						dataType: 'json',
+						data: {
+							back:"updatebrand",
+							roomo:roomo,
+							index:index
+						},  //数据，这里使用的是Json格式进行传输 
+						success: function(data) {
+							if(data.state == 0) {
+								layer.msg("指定成功！");
+								$("#"+index).remove()
+							}else if(data.state == 1){
+								layer.msg("此牌已发出，请重新选择！");
+								setTimeout(function () {
+					               window.location.reload()
+					            },500);
+							}else{
+								layer.msg("房间不存在！");
+								setTimeout(function () {
+					               window.location.reload()
+					         },500);
+						}
+					}
+				})}
+			</script>
+			</form>
+		</div>
+	</body>
+</html>

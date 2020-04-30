@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>所有作品</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<link rel="stylesheet" href="static/css/style.css">
+<style>
+.layui-table-cell {
+	height: auto;
+}
+
+.layui-btn {
+	margin-left: 180px;
+}
+.layui-table-box, .layui-table-view {
+    width: 405px;
+}
+</style>
+</head>
+<body>
+	<div class="container">
+		<fieldset class="layui-elem-field layui-field-title"
+			style="margin-top: 20px;">
+			<legend>后台登录日志</legend>
+		</fieldset>
+
+		<form class="layui-form">
+			<table class="layui-hide" id="test"></table>
+			<script src="layui/layui.js" charset="utf-8"></script>
+			<table id="demo" lay-data="{height: 'full-200', cellMinWidth: 80}"
+				lay-filter="test"></table>
+			<div id="test1"></div>
+			<script type="text/javascript" src="js/jquery.min.js"></script>
+			<script src="js/common.js"></script>
+			<script src="layui/layui.js"></script>
+			<script src="layer-v3.1.1/layer/mobile/layer.js"></script>
+
+			<script>
+				var list;
+				var userType;
+				var vip;
+				var laypage;
+				$(function() {
+					layui.use([ 'form', 'laypage' ], function() {
+						var form = layui.form;
+						laypage = layui.laypage;
+						userlist();
+					})
+				})
+			
+				function userlist(card_id) {
+					$.ajax({
+						type : "POST", //提交方式 
+						url : baseurl + "/admin?back=loginlog", //路径 
+						dataType : 'json',
+						data : {
+							backuserid : localStorage.getItem("backuserid")
+						}, //数据，这里使用的是Json格式进行传输 
+						success : function(data) { //返回数据根据结果进行相应的处理 
+							if (data.list.state == 101) {
+									layer.msg("您没有访问权限!");
+								}
+							console.log(data.list)
+							list = data.list.list;
+							layui.use('table', function() {
+								var table = layui.table;
+								//第一个实例
+								table.render({
+									elem : '#demo',
+									id : 'testReload',
+									data : list, //数据接口
+									cols : [
+										[ /* {
+														field : 'backuserid',
+														title : 'ID',
+														width : 80
+													}, */ {
+											field : 'backname',
+											title : '用户昵称',
+											width : 100
+										}, {
+											field : 'IP',
+											title : 'IP',
+											width : 137
+										}, {
+											field : 'date',
+											title : '登录时间',
+											width : 164
+										} ]
+									],
+									limits : [ 10 ],
+									limit : 10
+								});
+								laypage.render({
+									elem : 'test1', //注意，这里的 test1 是 ID，不用加 # 号
+									count : data.list.total, //数据总数，从服务端得到
+									jump : function(obj, first) {
+										//obj包含了当前分页的所有参数，比如：
+										console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
+										console.log(obj.limit); //得到每页显示的条数
+										//首次不执行
+										if (!first) {
+											$.ajax({
+												type : "POST", //提交方式 
+												url : baseurl + "/admin", //路径 
+												dataType : 'json',
+												data : {
+													back : "loginlog",
+													backuserid : localStorage.getItem("backuserid"),
+													pageNum : obj.curr
+												}, //数据，这里使用的是Json格式进行传输 
+												success : function(data) {
+													table.reload('testReload', {
+														data : data.list.list
+													});
+												}
+											})
+										}
+									}
+								});
+							});
+						}
+					});
+				}
+			</script>
+</body>
+</html>

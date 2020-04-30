@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport"
+		  content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>广州麻将-首页</title>
+	<link rel="stylesheet" href="layui/css/layui.css">
+	<link rel="stylesheet" href="layui/css/layui.mobile.css">
+	<link rel="stylesheet" href="static/css/style.css">
+	<script src="js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+	<style>
+		.layui-logo {
+			font-size: 22px !important;
+		}
+	</style>
+</head>
+<body class="layui-layout-body">
+<div class="chatContainer" style="z-index:999">
+	<div class="chatBtn">
+		<i class="iconfont icon-xiaoxi1"></i>
+	</div>
+</div>
+<div class="layui-layout layui-layout-admin">
+	<div class="layui-header">
+		<div class="layui-logo">广州麻将后台管理系统</div>
+		<ul class="layui-nav layui-layout-left">
+		</ul>
+		<ul class="layui-nav layui-layout-right">
+			<li class="layui-nav-item"><a onclick="refash()">
+				<span>刷新</span></a>
+			</li>
+			<li class="layui-nav-item"><a href="javascript:;">
+				<span>房卡数：</span>
+				<span style=" color: white;" class="menuone">贤心</span></a>
+			</li>
+			<li class="layui-nav-item"><a href="javascript:;"><span>欢迎</span>
+				<span style=" color: white;" class="userName">贤心</span></a>
+				<dl class="layui-nav-child">
+					<dd>
+						<a class="changeuse">修改资料</a>
+					</dd>
+					<dd>
+						<a class="changepwd">修改密码</a>
+					</dd>
+				</dl></li>
+			<li class="layui-nav-item"><a href="login.html">退出</a></li>
+		</ul>
+	</div>
+	<div class="layui-side layui-bg-black">
+		<div class="layui-side-scroll">
+			<ul id="ull" class="layui-nav layui-nav-tree" lay-filter="test">
+			</ul>
+		</div>
+	</div>
+	<div class="layui-body">
+		<div class="layui-tab layui-bg-gray" lay-filter="iframe-tab"
+			 lay-allowclose="true" style="margin:0;">
+			<ul class="layui-tab-title">
+				<li class="layui-this" lay-allowclose="false">首页</li>
+			</ul>
+			<div class="layui-tab-content layui-iframe" style="padding:0;">
+				<div class="layui-tab-item layui-show">
+					<iframe frameborder="0" src="happy.html" class="tab-iframe"></iframe>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="layui-footer"></div>
+</div>
+<script src="layui/layui.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/common.js"></script>
+<script>
+    var role = localStorage.getItem('dlrole')
+    if (role == null) {
+        alert("请登录后再查看!");
+        window.location.href = 'login.html'
+    }
+</script>
+<script>
+    var layer;
+    var backname = localStorage.getItem('dlbackname')
+    var menuone = localStorage.getItem('dlmenuone')
+	var ul = $("#ull");
+    var role = localStorage.getItem("dlrole");
+    if(role==2){
+        ul.append("<li class=\"layui-nav-item\"><a class=\"\" href=\"javascript:;\">代理管理</a>\n" +
+            "\t\t\t\t\t<dl class=\"layui-nav-child\">\n" +
+            "\t\t\t\t\t\t<dd>\n" +
+            "\t\t\t\t\t\t\t<a class=\"side-active\" href=\"javascript:;\" data-id=\"22\"\n" +
+            "\t\t\t\t\t\t\t   data-href=\"backuser.html\">我的代理</a>\n" +
+            "\t\t\t\t\t\t</dd>\n" +
+            "\t\t\t\t\t</dl></li>")
+	}else if(role==3){
+        ul.append("<li class=\"layui-nav-item\"><a class=\"\" href=\"javascript:;\">亲友圈</a>\n" +
+            "\t\t\t\t\t<dl class=\"layui-nav-child\">\n" +
+            "\t\t\t\t\t\t<dd>\n" +
+            "\t\t\t\t\t\t\t<a class=\"side-active\" href=\"javascript:;\" data-id=\"7\"\n" +
+            "\t\t\t\t\t\t\t   data-href=\"card_circle.html\">我的亲友圈</a>\n" +
+            "\t\t\t\t\t\t</dd>\n" +
+            "\t\t\t\t\t\t<dd>\n" +
+            "\t\t\t\t\t\t\t<a class=\"side-active\" href=\"javascript:;\" data-id=\"8\"\n" +
+            "\t\t\t\t\t\t\t   data-href=\"withdraw.html\">亲友圈审核</a>\n" +
+            "\t\t\t\t\t\t</dd>\n" +
+            "\t\t\t\t\t</dl></li>")
+	}
+
+	function refash(){
+		$.ajax({
+			url: baseurl + "/admin",
+			type:"post",
+			data:{back:"refash",
+				backuserid:localStorage.getItem("dlbackuserid")},
+			success:function (d) {
+			    console.log(d)
+				$(".menuone").html(d.date)
+				localStorage.setItem("dlmenuone",d.date)
+            }
+		})
+	}
+    $.ajax({
+        url: baseurl + "/admin",
+        type:"post",
+        data:{back:"refash",
+            backuserid:localStorage.getItem("dlbackuserid")},
+        success:function (d) {
+            console.log(d)
+            $(".menuone").html(d.date)
+            localStorage.setItem("dlmenuone",d.date)
+        }
+    })
+    $(function() {
+        $(".userName").text(backname);
+        $(".menuone").text(menuone);
+        layui.use([ 'element', 'layer' ],
+            function() {
+                var $ = layui.jquery,
+                    element = layui.element; //tab-iframe
+                layer = layui.layer; //tab-iframe
+                $('.side-active').on('click', function() {
+                    var id = $(this).attr('data-id');
+                    var title = $(this).html();
+                    var url = $(this).attr('data-href');
+                    //判断是否存在
+                    for (var i = 0; i < $('.tab-iframe').length; i++) {
+                        if ($('.tab-iframe').eq(i).attr('src') == url) {
+                            element.tabChange('iframe-tab', id);
+                            return;
+                        }
+                    }
+                    ;
+                    //新增一个Tab项
+                    res = element.tabAdd('iframe-tab', {
+                        title : $(this).html(), //用于演示
+                        content : '<iframe frameborder="0" src="' + url + '" class="tab-iframe"></iframe>',
+                        id : id
+                    })
+                    element.tabChange('iframe-tab', id);
+                });
+                $(".changeuse").click(function() {
+                    //页面层
+                    layer.open({
+                        type : 2,
+                        title : '修改个人资料',
+                        maxmin : true,
+                        area : [ '500px', '500px' ],
+                        content : 'changehoutaiuserInfo.html',
+                    });
+                })
+                $(".changepwd").click(function() {
+                    //页面层
+                    layer.open({
+                        type : 2,
+                        title : '修改密码',
+                        maxmin : true,
+                        area : [ '500px', '500px' ],
+                        content : 'changepwd.html',
+                    });
+                })
+            });
+    })
+</script>
+</body>
+</html>

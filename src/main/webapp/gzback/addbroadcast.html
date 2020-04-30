@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>轮播图上传</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<link rel="stylesheet" href="static/css/style.css">
+<style>
+.img {
+	width: 92px;
+	height: 92px;
+	padding-left: 10px;
+}
+
+.color {
+	color: red;
+}
+
+.aa {
+	margin-left: 5px;
+}
+
+.layui-btnnum {
+	width: 40px;
+	margin-left: 4px;
+}
+</style>
+</head>
+<body>
+	<div class="container">
+		<fieldset class="layui-elem-field layui-field-title"
+			style="margin-top: 20px;">
+			<legend>轮播图上传</legend>
+		</fieldset>
+		<form class="layui-form" action="" style="margin-left: 50px;">
+			<div class="layui-form-item">
+				<label class="layui-form-label">上传图片</label>
+				<div class="layui-upload">
+					<input style="display: none;" type="file" name="projectFile"
+						id="file" onchange="xmTanUploadImg1(this)" value="" /> <label
+						for="file" class="layui-btn">选择图片</label>
+					<div class="layui-upload-list" style="display: inline-block;">
+						<img style="width: 200px;" id="xmTanImg" />
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">跳转链接</label>
+					<div class="layui-input-block">
+						<input type="text" name="vx" lay-verify="vx" autocomplete="off"
+							placeholder="请输入跳转链接" class="layui-input vx" style="width:300px;">
+					</div>
+				</div>
+			</div>
+			<div style="margin-left:300px;margin-top: 50px; ">
+				<a class="layui-btn layui-btn-sm" lay-filter="addNews" lay-submit><i
+					class="layui-icon">&#xe609;</i>保存</a>
+			</div>
+			<script src="layui/layui.js "></script>
+			<script type="text/javascript" src="js/jquery.min.js"></script>
+			<script src="js/common.js"></script>
+			<script src="js/addfile.js"></script>
+			<script src="layer-v3.1.1/layer/mobile/layer.js"></script>
+		</form>
+	</div>
+</body>
+</html>

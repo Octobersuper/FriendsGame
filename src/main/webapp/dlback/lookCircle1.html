@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>俱乐部管理</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<link rel="stylesheet" href="static/css/style.css">
+<style>
+.layui-table-cell {
+	height: auto;
+}
+</style>
+
+	<script type="text/html" id="barDemo4">
+		<a class="layui-btn layui-btn-xs  layui-btn-normal" lay-event="zhanji">查看</a>
+	</script>
+<body>
+	<div class="container">
+		<fieldset class="layui-elem-field layui-field-title"
+			style="margin-top: 20px;">
+			<legend>查看俱乐部成员</legend>
+		</fieldset>
+		<form class="layui-form">
+			<table class="layui-hide" id="test"></table>
+			<script src="layui/layui.js" charset="utf-8"></script>
+			<table id="demo" lay-filter="test"></table>
+			<div id="test1"></div>
+			<script type="text/javascript" src="js/jquery.min.js"></script>
+			<script src="js/common.js"></script>
+			<script src="layui/layui.js"></script>
+			<script src="layer-v3.1.1/layer/mobile/layer.js"></script>
+
+			<script>
+				var list;
+				var userType;
+				var vip;
+				var laypage;
+				layui.use([ 'form', 'laypage', 'layer' ], function() {
+					var form = layui.form;
+					var $ = layui.jquery;
+					layer = layui.layer; //独立版的layer无需执行这一句
+					laypage = layui.laypage;
+					$(function() {
+						userlist();
+					}
+					)
+				})
+			
+				function userlist() {
+					$.ajax({
+						type : "GET", //提交方式 
+						url : baseurl + "/admin", //路径 
+						dataType : 'json',
+						data : {
+							back : "lookCircle",
+							circlenumber : localStorage.getItem("dlcirclenumber")
+						}, //数据，这里使用的是Json格式进行传输 
+						success : function(data) { //返回数据根据结果进行相应的处理 
+						if (data.list.state == 101) {
+									layer.msg("您没有访问权限!");
+								}
+							list = data.list;
+							layui.use('table', function() {
+								var table = layui.table;
+								//第一个实例
+								table.render({
+									elem : '#demo',
+									id : 'testReload',
+									data : list, //数据接口
+									cols : [
+										[  {
+											field : 'userid',
+											title : '玩家ID',
+											width : 100
+										}, {
+											field : 'nickname',
+											title : '玩家昵称',
+											width : 90
+										}, {
+                                            title : '积分变动',
+                                            width : 100,
+                                            align : 'center',
+                                            toolbar : '#barDemo4'
+                                        }, {
+                                            title : '游戏局数',
+                                            field : 'number_1',
+                                            width : 100,
+                                        }, {
+											field : 'diamond',
+											title : '房卡数量',
+											width : 100
+										},{
+											field : 'date',
+											title : '加入时间',
+											width : 160
+										}]
+									]
+								});
+                                table.on('tool(test)', function(obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+                                    var data = obj.data; //获得当前行数据
+                                    var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+                                    var tr = obj.tr; //获得当前行 tr 的DOM对象
+                                    var sysuserid = data.backuserid;
+                                    if (layEvent === 'deluser') {
+                                        $.ajax({
+                                            type : "post", //提交方式
+                                            url : baseurl + "/admin?back=delsystemuser", //路径
+                                            dataType : 'json',
+                                            data : {
+                                                userid : localStorage.getItem("backuserid"),
+                                                sysuserid : sysuserid
+                                            }, //数据，这里使用的是Json格式进行传输
+                                            success : function(data) {
+                                                if (data.state == "success") {
+                                                    layer.msg("删除成功");
+                                                    setTimeout(function() {
+                                                        window.location.reload()
+                                                    }, 500);
+                                                } else if (data.state.state == 101) {
+                                                    parent.layer.msg("不能删除自己!");
+                                                } else if (data.state.state == 100) {
+                                                    parent.layer.msg("无超管权限，删除失败!");
+                                                }
+                                            }
+                                        })
+                                    } else if (layEvent === 'updatediamond') {
+                                        var userid = data.userid;
+                                        var zuserid = localStorage.getItem("dlbackuserid");
+                                        localStorage.setItem("dlzuserid", zuserid)
+                                        localStorage.setItem("dluserid", userid)
+                                        localStorage.setItem("dlstate", 0)
+                                        layer.open({
+                                            type : 2,
+                                            title : '房卡充值',
+                                            maxmin : true,
+                                            shadeClose : false, //点击遮罩关闭层
+                                            area : [ '600px', '300px' ],
+                                            content : 'updiamond.html?userid=' + userid
+                                        });
+                                    } else if (layEvent === 'withdrawdiamond') {
+                                        var userid = data.userid;
+                                        var zuserid = localStorage.getItem("dlbackuserid");
+                                        localStorage.setItem("dlzuserid", zuserid)
+                                        localStorage.setItem("dluserid", userid)
+                                        localStorage.setItem("dlstate", 0)
+                                        layer.open({
+                                            type : 2,
+                                            title : '房卡提现',
+                                            maxmin : true,
+                                            shadeClose : false, //点击遮罩关闭层
+                                            area : [ '600px', '300px' ],
+                                            content : 'updiamonds.html?userid=' + userid
+                                        });
+                                    }else if (layEvent === 'zhanji') {//查看战绩
+                                        var userid = data.userid;
+                                        localStorage.setItem("dluserid", userid)
+                                        layer.open({
+                                            type : 2,
+                                            title : '积分变动',
+                                            maxmin : true,
+                                            shadeClose : false, //点击遮罩关闭层
+                                            area : [ '550px', '450px' ],
+                                            content : 'gamerecord2.html?zuserid=' + zuserid
+                                        });
+                                    }
+                                });
+							});
+						}
+					});
+				}
+			</script>
+		</form>
+	</div>
+</body>
+</html>

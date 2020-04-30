@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>首页</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="layui/css/layui.css" media="all"/>
+    <link rel="stylesheet" href="layui/css/layui.css">
+    <link rel="stylesheet" href="layui/css/layui.mobile.css">
+    <link rel="stylesheet" href="static/css/style.css">
+    <style>
+        #demo2 img{
+            width: 100px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body class="childrenBody">
+<div class="layui-row layui-col-space10 panel_box" style="margin: 0">
+    <form action="" class="layui-form">
+        <fieldset class="layui-elem-field layui-field-title" style="">
+            <legend>二维码图片</legend>
+        </fieldset>
+
+        <!--<div class="layui-upload">
+            <button type="button" class="layui-btn" id="test2">选择图片</button>
+            <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+                预览图：
+                <div class="layui-upload-list" id="demo2"></div>
+            </blockquote>
+        </div>-->
+
+
+        <div class="layui-form-item">
+            <div class="layui-upload">
+                <!--<input value="测试" type="file" id="fileimg"/>-->
+                <input style="display: none;" multiple="multiple" type="file" name="files" id="file" onchange="xmTanUploadImg(this)" value="" />
+                <label for="file" class="layui-btn" >上传图片</label>
+                <!--<button type="file" class="layui-btn" id="test1"></button>-->
+                <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+                    预览图：
+                    <div class="layui-upload-list" id="demo2"></div>
+                </blockquote>
+            </div>
+        </div>
+
+        <fieldset class="layui-elem-field layui-field-title" style="">
+            <legend>客服微信</legend>
+        </fieldset>
+
+        <div class="layui-form-item">
+            <div style="margin-left: 0" class="layui-input-block">
+                <input type="text" name="wx" lay-verify="required" id="wx" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <fieldset class="layui-elem-field layui-field-title" style="">
+            <legend>客服QQ</legend>
+        </fieldset>
+        <div class="layui-form-item">
+            <div style="margin-left: 0" class="layui-input-block">
+                <textarea placeholder="请输入内容" name="qq" id="qq" class="layui-textarea"></textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item center" style="text-align: center">
+            <a class="layui-btn layui-btn" lay-filter="addNews" lay-submit><i class="layui-icon">&#xe609;</i>提交</a>
+        </div>
+    </form>
+
+</div>
+<script type="text/javascript" src="layui/layui.js"></script>
+<script src="js/common.js"></script>
+<script type="text/javascript" src="addinformation.js"></script>
+</body>
+<script>
+    layui.use(['form','layer','layedit','laydate','upload'],function(){
+        var form = layui.form
+        layer = parent.layer === undefined ? layui.layer : top.layer,
+            laypage = layui.laypage,
+            upload = layui.upload,
+            layedit = layui.layedit,
+            laydate = layui.laydate,
+            $ = layui.jquery;
+
+        $.ajax({
+            type: "get",
+            url: baseurl+"/service/getone",
+            success: function(res) {
+                if(res.meta.code==200){
+                    $('#demo2').append('<img src="' + baseurl+res.data.img + '" class="layui-upload-img">')
+                    //加载层
+                    $("#qq").val(res.data.qq);
+                    $("#wx").val(res.data.wx);
+                }else{
+                    //加载层
+                    var index = layer.load(0, {shade: false,time:1000} ); //0代表加载的风格，支持0-2
+                    setTimeout(function(){ layer.msg(''+res.meta.msg+'',{icon:2,time:1000});index.closed}, 1000);
+                }
+            }
+        })
+
+        form.on("submit(addNews)",function(data){
+            var files = document.getElementById("file").files;
+            //如果有选择图片则上传图片
+            console.log(data)
+            var formData = new FormData();
+            if(files.length > 0) {
+                for(var i = 0; i < files.length; i++) {
+                    //append是将信息文件放到formdata中
+                    formData.append('uploadFile', files[i]);
+                }
+                formData.append('wx', data.field.wx);//标题
+                formData.append('qq', data.field.qq);//内容
+                $.ajax({
+                    type: "post",
+                    url: baseurl+"/service/update",
+                    data: formData,
+                    async: true,
+                    processData: false,
+                    contentType: false,
+                    mimeType: "multipart/form-data",
+                    success: function(res) {
+                        jsondata=$.parseJSON(res);
+                        if(jsondata.meta.code==200){
+                            //加载层
+                            var index = layer.load(0, {shade: false,time:1000} ); //0代表加载的风格，支持0-2
+                            setTimeout(function(){ layer.msg(''+jsondata.meta.msg+'',{icon:1,time:1000});index.closed}, 1000);
+                        }else{
+                            //加载层
+                            var index = layer.load(0, {shade: false,time:1000} ); //0代表加载的风格，支持0-2
+                            setTimeout(function(){ layer.msg(''+jsondata.meta.msg+'',{icon:2,time:1000});index.closed}, 1000);
+                        }
+                    }
+                })
+                return false;
+            }
+        })
+    })
+
+
+    function xmTanUploadImg(obj) {
+        var reader;
+        var file;
+        for (var i=0;i<obj.files.length;i++){
+            file = obj.files[i];
+            reader = new FileReader();
+            //读取文件过程方法
+            reader.onload = function(e) {
+                console.log("成功读取....");
+                $('#demo2').html('<img src="' + e.target.result + '" class="layui-upload-img">')
+                //或者 img.src = this.result;  //e.target == this
+            }
+
+            reader.readAsDataURL(file)
+        }
+
+    }
+</script>
+</html>

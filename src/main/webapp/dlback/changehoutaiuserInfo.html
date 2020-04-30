@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>修改信息</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<link rel="stylesheet" href="static/css/style.css">
+<style>
+
+</style>
+</head>
+<body>
+	<div class="container">
+		<fieldset class="layui-elem-field layui-field-title"
+			style="margin-top: 20px;">
+			<legend>修改信息</legend>
+		</fieldset>
+
+		<form class="layui-form" style="margin-top: 100px;">
+			<div class="layui-form-item">
+				<label class="layui-form-label">管理员昵称</label>
+				<div class="layui-input-block">
+					<input type="text" name="title" lay-verify="title"
+						autocomplete="off" placeholder="请输入用户名"
+						class="layui-input backname">
+				</div>
+			</div>
+		</form>
+		<div style="margin-left:200px;margin-top: 50px; ">
+			<button class="layui-btn layui-btn-lg layui-btn-normal " id="save">保存</button>
+		</div>
+	</div>
+
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script src="js/common.js"></script>
+	<script src="layui/layui.js"></script>
+	<script src="layer-v3.1.1/layer/mobile/layer.js"></script>
+	<script>
+		var form;
+		var layer;
+		$(function() {
+			$(".backname").val(localStorage.getItem("backname"));
+			layui.use([ 'element', 'form', 'layer' ], function() {
+				var $ = layui.jquery,
+					element = layui.element;
+				form = layui.form;
+				layer = layui.layer;
+			});
+	
+			$("#save").click(function() {
+				$.ajax({
+					type : "POST", //提交方式 
+					url : baseurl + "/backuser",
+					dataType : 'json',
+					data : {
+						back : "upuser",
+						backuserid : localStorage.getItem("backuserid"),
+						backname : $(".backname").val(),
+					}, //数据，这里使用的是Json格式进行传输 
+					success : function(data) { //返回数据根据结果进行相应的处理 
+						if (data.state == "success") {
+							localStorage.setItem("backname", $(".backname").val());
+							layer.msg('修改成功 ', {
+								icon : 1
+							});
+						} else {
+							layer.msg('修改失败 ', {
+								icon : 5
+							});
+						}
+					}
+				});
+			})
+		})
+	</script>
+</body>
+</html>

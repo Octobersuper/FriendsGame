@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>所有作品</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<link rel="stylesheet" href="static/css/style.css">
+<style>
+.layui-table-cell {
+	height: auto;
+}
+</style>
+</head>
+<body>
+	<div class="container">
+		<fieldset class="layui-elem-field layui-field-title"
+			style="margin-top: 20px;">
+			<legend>房间列表</legend>
+		</fieldset>
+		<form class="layui-form" action="">
+			<div class="layui-inline"
+				Style=" width:100% ; text-align: left ;margin-right:10px">
+				<input type="text" style="width:300px;display:inline"
+					class="layui-input" id="input-search" placeholder="请输入房间号" /> <span
+					id="search" class="layui-btn">查找</span>
+			</div>
+		</form>
+		<form class="layui-form">
+			<table class="layui-hide" id="test"></table>
+			<script src="layui/layui.js" charset="utf-8"></script>
+			<table id="demo" lay-data="{height: 'full-200', cellMinWidth: 80}"
+				lay-filter="test"></table>
+			<div id="test1"></div>
+			<script type="text/javascript" src="js/jquery.min.js"></script>
+			<script src="js/common.js"></script>
+			<script src="layui/layui.js"></script>
+			<script src="layer-v3.1.1/layer/mobile/layer.js"></script>
+			<script type="text/html" id="barDemo1">
+				<a class="layui-btn layui-btn-xs" lay-event="roomdetail">查看</a>
+			</script>
+
+			<script>
+				var list;
+				var userType;
+				var vip;
+				var laypage;
+				$(function() {
+					layui.use([ 'form', 'laypage' ], function() {
+						var form = layui.form;
+						laypage = layui.laypage;
+						userlist(null);
+						$("#search").click(function() {
+							var roomnum = $("#input-search").val();
+							userlist(roomnum);
+						})
+					})
+				})
+				function userlist(roomnum) {
+					$.ajax({
+						type : "POST", //提交方式 
+						url : baseurl + "/admin", //路径 
+						dataType : 'json',
+						data : {
+						backuserid : localStorage.getItem("backuserid"),
+							roomnum : roomnum,
+							back : "getroom"
+						}, //数据，这里使用的是Json格式进行传输 
+						success : function(data) { //返回数据根据结果进行相应的处理 
+						if (data.list.state == 101) {
+									layer.msg("您没有访问权限!");
+								}
+							list = data.list.list;
+							layui.use('table', function() {
+								var table = layui.table;
+								//第一个实例
+								table.render({
+									elem : '#demo',
+									id : 'testReload',
+									data : list, //数据接口
+									cols : [
+										[ {
+											field : 'roomno',
+											title : '房间号',
+											width : 90
+										}, {
+											field : 'money',
+											title : '房卡消耗',
+											width : 90,
+											templet : '<div><span>{{d.money}}</span>张</div>'
+										}, {
+											field : 'max_number',
+											title : '游戏局数',
+											width : 90,
+											templet : '<div><span>{{d.max_number}}</span>局</div>'
+										}, {
+											field : 'max_person',
+											title : '最大人数',
+											width : 90,
+											templet : '<div><span>{{d.max_person}}</span>人</div>'
+										}, {
+											field : 'downscore',
+											title : '底分',
+											width : 90,
+											templet : '<div><span>{{d.downscore}}</span>分</div>'
+										}, {
+											field : 'adjust_brand',
+											title : '换三张',
+											width : 80,
+											templet : '#adjustTmp'
+										}, {
+											field : 'assured_brand',
+											title : '是否定缺',
+											width : 90,
+											templet : '#assuredTmp'
+										}, {
+											field : 'aircraft',
+											title : '字牌算飞机',
+											width : 100,
+											templet : '#aircraftTmp'
+										}, {
+											field : 'ranging',
+											title : '测距功能',
+											width : 90,
+											templet : '#rangingTmp'
+										}, {
+											title : '操作',
+											width : 120,
+											align : 'center',
+											toolbar : '#barDemo1'
+										} ]
+									],
+									limits : [ 10 ],
+									limit : 10
+								});
+								laypage.render({
+									elem : 'test1', //注意，这里的 test1 是 ID，不用加 # 号
+									count : data.list.total, //数据总数，从服务端得到
+									jump : function(obj, first) {
+										//obj包含了当前分页的所有参数，比如：
+										console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
+										console.log(obj.limit); //得到每页显示的条数
+										//首次不执行
+										if (!first) {
+											$.ajax({
+												type : "POST", //提交方式 
+												url : baseurl + "/backuser", //路径 
+												dataType : 'json',
+												data : {
+												backuserid : localStorage.getItem("backuserid"),
+													pageNum : obj.curr,
+													roomnum : roomnum,
+													back : "getroom"
+												}, //数据，这里使用的是Json格式进行传输 
+												success : function(data) {
+													if (data.list.list.length > 0) {
+														table.reload('testReload', {
+															data : data.list.list
+														});
+													}
+												}
+											})
+										}
+									}
+								});
+								table.on('tool(test)', function(obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+									var data = obj.data; //获得当前行数据
+									var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+									var tr = obj.tr; //获得当前行 tr 的DOM对象
+									if (layEvent === 'roomdetail') {
+										var roomo = data.roomno;
+										localStorage.setItem("roomo", roomo)
+										layer.open({
+											type : 2,
+											title : '对战详情',
+											maxmin : true,
+											shadeClose : false, //点击遮罩关闭层
+											area : [ '100%', '100%' ],
+											content : 'roomdetail.html?roomo=' + roomo
+										})
+									}
+								});
+							});
+						}
+					});
+				}
+			</script>
+			<script type="text/html" id="adjustTmp">
+				{{# if (d.adjust_brand=== 0) { }}
+				<span>关</span> {{# } else { }}
+				<span>开</span> {{# } }}
+			</script>
+			<script type="text/html" id="assuredTmp">
+				{{# if (d.assured_brand=== 0) { }}
+				<span>关</span> {{# } else { }}
+				<span>开</span> {{# } }}
+			</script>
+			<script type="text/html" id="aircraftTmp">
+				{{# if (d.aircraft=== 0) { }}
+				<span>关</span> {{# } else { }}
+				<span>开</span> {{# } }}
+			</script>
+			<script type="text/html" id="rangingTmp">
+				{{# if (d.ranging=== 0) { }}
+				<span>关</span> {{# } else { }}
+				<span>开</span> {{# } }}
+			</script>
+			</form>
+		</div>
+	</body>
+</html>

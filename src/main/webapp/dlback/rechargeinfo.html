@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>首页</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<link rel="stylesheet" href="static/css/style.css">
+<style>
+.layui-table-cell {
+	height: auto;
+}
+
+.layui-btn {
+	margin-left: 10px;
+}
+.layui-table-box, .layui-table-view {
+    width: 182px;
+}
+</style>
+</head>
+<body>
+	<div class="container">
+		<fieldset class="layui-elem-field layui-field-title"
+			style="margin-top: 20px;">
+			<legend>充值统计</legend>
+		</fieldset>
+		<form class="layui-form">
+			<div class="layui-inline"
+				Style=" width:100% ; text-align: left ;margin-right:10px">
+				选择日期：<input type="text" name="publishTime"
+					style="width:30%;display:inline " readonly class="layui-input"
+					id="start_time" placeholder="请选择日期"> <span id="search"
+					class="layui-btn">搜索</span>
+			</div>
+		</form>
+		<div style="display:inline">
+		<div style="float:left;margin-top:10px">累计充值：</div>
+		<div style="float:left">
+		<form class="layui-form">
+			<table class="layui-hide" id="test"></table>
+			<script src="layui/layui.js" charset="utf-8"></script>
+			<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+			<table id="demo" lay-filter="test"></table>
+			<div id="test1"></div>
+			<script type="text/javascript" src="js/jquery.min.js"></script>
+			<script src="js/common.js"></script>
+			<script src="layui/layui.js"></script>
+			<script src="layer-v3.1.1/layer/mobile/layer.js"></script>
+			<script>
+				var list;
+				var userType;
+				var laypage;
+				var enddate = 1;
+				$(function() {
+					layui.use([ 'form', 'laypage', 'laydate' ], function() {
+						var form = layui.form;
+						laypage = layui.laypage;
+						userlist();
+						$("#search").click(function() {
+							date = $("#start_time").val();
+							userlist(date);
+						})
+						//选中后的回调
+						layui.laydate.render({
+							elem : '#start_time',
+							trigger : 'click'
+						});
+					})
+				})
+				function userlist(date) {
+					$.ajax({
+						type : "POST", //提交方式 
+						url : baseurl + "/admin", //路径 
+						dataType : 'json',
+						data : {
+							back : "getrechargeinfo",
+							start_time : date,
+							backuserid : localStorage.getItem("backuserid")
+						}, //数据，这里使用的是Json格式进行传输 
+						success : function(data) { //返回数据根据结果进行相应的处理 
+							if (data.list.state == 101) {
+									layer.msg("您没有访问权限!");
+								}
+							var money;
+							var diamond;
+							if (data.list[0].money === undefined || data.list[0].money === null || data.list[0].money === "" ) {
+								money = 0;
+							} else {
+								money = data.list[0].money;
+							}
+							list = data.list;
+							layui.use('table', function() {
+								var table = layui.table;
+								//第一个实例
+								table.render({
+									elem : '#demo',
+									id : 'testReload',
+									data : list, //数据接口
+									cols : [
+										[ {
+											field : 'money',
+											title : '房卡数量',
+											width : 180,
+											templet : '<div><span>' + money + '</span>个</div>'
+										} ]
+									]
+								});
+							});
+						}
+					});
+				}
+			</script>
+		</form>
+	</div>
+	</div>
+	</div>
+</body>
+</html>

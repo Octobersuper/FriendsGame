@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>所有作品</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<link rel="stylesheet" href="static/css/style.css">
+<style>
+.layui-table-cell {
+	height: auto;
+}
+</style>
+</head>
+<body>
+	<div class="container">
+		<fieldset class="layui-elem-field layui-field-title"
+			style="margin-top: 20px;">
+			<legend>兑换申请列表</legend>
+		</fieldset>
+		<form class="layui-form">
+			<table class="layui-hide" id="test"></table>
+			<script src="layui/layui.js" charset="utf-8"></script>
+			<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+			<table id="demo" lay-filter="test"></table>
+			<div id="test1"></div>
+			<script type="text/javascript" src="js/jquery.min.js"></script>
+			<script src="js/common.js"></script>
+			<script src="layui/layui.js"></script>
+			<script src="layer-v3.1.1/layer/mobile/layer.js"></script>
+			<script type="text/html" id="barDemo">
+				<a class="layui-btn layui-btn-xs" lay-event="pass">通过</a>
+				<a class="layui-btn layui-btn-danger layui-btn-xs layui-btn-normal " lay-event="down">拒绝</a>
+			</script>
+			<script>
+				var list;
+				var userType;
+				var vip;
+				var laypage;
+				$(function() {
+					layui.use([ 'form', 'laypage' ], function() {
+						var form = layui.form;
+						laypage = layui.laypage;
+						userlist();
+					})
+				})
+				function userlist() {
+					$.ajax({
+						type : "GET", //提交方式 
+						url : baseurl + "/admin", //路径 
+						dataType : 'json',
+						data : {
+							back : "getconuser",
+							backuserid : localStorage.getItem("backuserid")
+						}, //数据，这里使用的是Json格式进行传输 
+						success : function(data) { //返回数据根据结果进行相应的处理 
+							if (data.list.state == 101) {
+								layer.msg("权限不足，无法查看");
+							}
+							console.log(data.data);
+							list = data.list.list;
+							layui.use('table', function() {
+								var table = layui.table;
+								//第一个实例
+								table.render({
+									elem : '#demo',
+									id : 'testReload',
+									data : list, //数据接口
+									cols : [
+										[ {
+											field : 'zuserid',
+											title : '玩家ID',
+											width : 90
+										}, {
+											field : 'nickname',
+											title : '玩家姓名',
+											width : 100
+										}, {
+											field : 'phone',
+											title : '手机号',
+											width : 120
+										}, {
+											field : 'content',
+											title : '兑换详情',
+											width : 120   
+										},{
+											field : 'ticketnums',
+											title : '消耗奖券（单位/个）',
+											width : 161,
+											templet : '<div><span>{{d.ticketnums}}</span>个</div>'  
+										}, {
+											field : 'date',
+											title : '申请时间',
+											width : 160
+										}, {
+											field : 'type',
+											title : '审核状态',
+											width : 100,
+											templet : '#typeTmp'
+										}, {
+											title : '操作',
+											width : 120,
+											align : 'center',
+											toolbar : '#barDemo'
+										} ]
+									],
+									limits : [ 10 ],
+									limit : 10
+								});
+								laypage.render({
+									elem : 'test1', //注意，这里的 test1 是 ID，不用加 # 号
+									count : data.list.total, //数据总数，从服务端得到
+									jump : function(obj, first) {
+										//obj包含了当前分页的所有参数，比如：
+										console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
+										console.log(obj.limit); //得到每页显示的条数
+										//首次不执行
+										if (!first) {
+											$.ajax({
+												type : "POST", //提交方式 
+												url : baseurl + "/admin", //路径 
+												dataType : 'json',
+												data : {
+													back : "getconuser",
+													pageNum : obj.curr
+												}, //数据，这里使用的是Json格式进行传输 
+												success : function(data) {
+													table.reload('testReload', {
+														data : data.list.list
+													});
+												}
+											})
+										}
+									}
+								});
+								table.on('tool(test)', function(obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+									var data = obj.data; //获得当前行数据
+									var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+									var tr = obj.tr; //获得当前行 tr 的DOM对象
+									if (layEvent === 'down') { //拒绝
+										var conuserid = data.conuserid;
+										var type = data.type;
+										var connum = data.ticketnums;
+										var userid = data.userid;
+										$.ajax({
+											type : "post", //提交方式 
+											url : baseurl + "/admin", //路径
+											dataType : 'json',
+											data : {
+												back : "downconversion",
+												conuserid : conuserid,
+												userid : userid,
+												connum : connum,
+												type : type
+											}, //数据，这里使用的是Json格式进行传输 
+											success : function(data) {
+												if (data.status == "success") {
+													setTimeout(function() {
+														location.reload();
+														parent.layer.msg('该申请已拒绝,奖券退还给玩家!');
+													});
+												} else {
+													setTimeout(function() {
+														location.reload();
+														parent.layer.msg('请勿重复操作!');
+													});
+												}
+											}
+										})
+									} else if (layEvent === 'pass') { //通过
+										var conuserid = data.conuserid;
+										var type = data.type;
+										$.ajax({
+											type : "post", //提交方式 
+											url : baseurl + "/admin", //路径
+											dataType : 'json',
+											data : {
+												back : "passconversion",
+												conuserid : conuserid,
+												type : type
+											}, //数据，这里使用的是Json格式进行传输 
+											success : function(data) {
+												if (data.status == "success") {
+													setTimeout(function() {
+														location.reload();
+														parent.layer.msg('该申请已通过!');
+													});
+												} else {
+													setTimeout(function() {
+														location.reload();
+														parent.layer.msg('请勿重复操作!');
+													});
+												}
+											}
+										})
+									}
+								});
+							});
+						}
+					});
+				}
+			</script>
+			<script type="text/html" id="typeTmp">
+				{{# if (d.type === '0') { }}
+				<span>未处理</span> 
+				{{# }else if(d.type === '1'){ }}
+				<span>通过</span> 
+				{{# } else { }}
+				<span>拒绝</span> 
+				{{# } }}
+			</script>
+		</form>
+	</div>
+</body>
+</html>

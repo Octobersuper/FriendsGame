@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>所有作品</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<link rel="stylesheet" href="static/css/style.css">
+<style>
+.layui-table-cell {
+	height: auto;
+}
+.layui-table-box, .layui-table-view {
+    width: 545px;
+}
+</style>
+</head>
+<body>
+	<div class="container">
+		<fieldset class="layui-elem-field layui-field-title"
+			style="margin-top: 20px;">
+			<legend>房卡充值管理</legend>
+		</fieldset>
+		<form class="layui-form">
+			<table class="layui-hide" id="test"></table>
+			<script src="layui/layui.js" charset="utf-8"></script>
+			<table id="demo" lay-filter="test"></table>
+			<div id="test1"></div>
+			<script type="text/javascript" src="js/jquery.min.js"></script>
+			<script src="js/common.js"></script>
+			<script src="layui/layui.js"></script>
+			<script src="layer-v3.1.1/layer/mobile/layer.js"></script>
+			<script type="text/html" id="barDemo">
+				<a class="layui-btn layui-btn-xs" lay-event="upd">修改</a>
+			</script>
+			<script>
+				var list;
+				var userType;
+				var vip;
+				var laypage;
+				$(function() {
+					layui.use([ 'form', 'laypage' ], function() {
+						var form = layui.form;
+						laypage = layui.laypage;
+						userlist();
+					})
+				})
+				function userlist() {
+					$.ajax({
+						type : "POST", //提交方式 
+						url : baseurl + "/admin", //路径 
+						dataType : 'json',
+						data : {
+							back : "getdiamondshop",
+							backuserid : localStorage.getItem("backuserid")
+						}, //数据，这里使用的是Json格式进行传输 
+						success : function(data) { //返回数据根据结果进行相应的处理 
+							if (data.list.state == 101) {
+									layer.msg("您没有访问权限!");
+								}
+							list = data.list;
+							layui.use('table', function() {
+								var table = layui.table;
+								//第一个实例
+								table.render({
+									elem : '#demo',
+									id : 'testReload',
+									data : list, //数据接口
+									cols : [
+										[ {
+											field : 'diamondname',
+											title : '商品名称',
+											width : 120
+										}, {
+											field : 'realvalue',
+											title : '可得房卡 (单位/个)',
+											width : 150
+										}, {
+											field : 'price',
+											title : '充值金额 (单位/元)',
+											width : 150
+										}, {
+											title : '操作',
+											width : 120,
+											align : 'center',
+											toolbar : '#barDemo'
+										} ]
+									]
+								});
+								table.on('tool(test)', function(obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+									var data = obj.data; //获得当前行数据
+									var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+									var tr = obj.tr; //获得当前行 tr的DOM对象
+									var diamondid = data.diamondid;
+									var diamondname = data.diamondname;
+									var realvalue = data.realvalue;
+									var price = data.price;
+									localStorage.setItem("diamondid", diamondid);
+									localStorage.setItem("diamondname", diamondname);
+									localStorage.setItem("realvalue", realvalue);
+									localStorage.setItem("price", price);
+									
+									if (layEvent === 'upd') {
+										layer.open({
+											type : 2,
+											title : '修改房卡',
+											maxmin : true,
+											shadeClose : false, //点击遮罩关闭层
+											area : [ '500px', '400px' ],
+											content : 'upddiamond.html?diamondid=' +diamondid
+										});
+									}
+								});
+							});
+						}
+					});
+				}
+			</script>
+		</form>
+	</div>
+</body>
+</html>
