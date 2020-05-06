@@ -473,13 +473,15 @@ public class Mahjong_Socket {
                     userBean.getRecordMsgList().add("杠上炮*2");
                 }
                 if(userBean.getZha()!=0){
-                    userBean.setPower_number(userBean.getPower_number()*userBean.getZha());//扎针
+                    userBean.setPower_number(userBean.getPower_number()*2);//扎针
                 }
                 userBean.setPower_number(userBean.getPower_number()+userBean.getFu());//辅分
 
 
                 List<Integer> brandValue = mahjong_Util.User_Brand_Value(userBean.getBrands());
                 Collections.sort(brandValue);
+                brandValue.remove(Integer.parseInt(jsonTo.get("brand")));
+                brandValue.add(Integer.parseInt(jsonTo.get("brand")));
                 System.out.println(">>>>>>>牌型检测完成啦");
                 // 结算500=已经结算 501=等待别人胡牌操作 502=等待别人结算
                 int state = gameService.End_Game(userBean, roomBean, p_userid, 1);
@@ -544,12 +546,14 @@ public class Mahjong_Socket {
                 userBean.getRecordMsgList().add("杠上花*2");
             }
             if(userBean.getZha()!=0){
-                userBean.setPower_number(userBean.getPower_number()*userBean.getZha());//扎针
+                userBean.setPower_number(userBean.getPower_number()*2);//扎针
             }
             userBean.setPower_number(userBean.getPower_number()+userBean.getFu());//辅分
 
             List<Integer> brandValue = mahjong_Util.User_Brand_Value(userBean.getBrands());
             Collections.sort(brandValue);
+            brandValue.remove(Integer.parseInt(jsonTo.get("brand")));
+            brandValue.add(Integer.parseInt(jsonTo.get("brand")));
             System.out.println(">>>>>>>牌型检测完成啦");
             // 自摸结算
             int state = gameService.End_Game_This(userBean, roomBean);
