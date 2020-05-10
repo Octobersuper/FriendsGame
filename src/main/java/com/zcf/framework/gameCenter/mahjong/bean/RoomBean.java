@@ -609,6 +609,8 @@ public class RoomBean {
 				returnMap.put("nextMap", this.nextMap);
 			if ("dice".equals(name))
 				returnMap.put("dice", this.dice);
+			if ("clubid".equals(name))
+				returnMap.put("clubid", this.clubid);
 			if ("user_log".equals(name)) {
 				if (this.user_log.size() == 0) {
 					returnMap.put("user_log", null);
@@ -812,6 +814,7 @@ public class RoomBean {
 			userBean.setExit_game(0);
 			userBean.setFu(0);
 			userBean.setZha(0);
+			userBean.setHu_type("");
 		}
 	}
 

@@ -5,7 +5,7 @@ spring:
   datasource:
 #   数据源基本配置
     username: root
-    password: hyyl123123
+    password: 123456
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/friendsgame
     type: com.alibaba.druid.pool.DruidDataSource

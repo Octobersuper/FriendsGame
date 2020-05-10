@@ -2,8 +2,8 @@
 var ip = reg.exec(window.location.href)[0];
 */
 //var baseurl = "http://"+ip+":8094/Guangan_Mahjong";
-//var baseurl = "http://localhost:8081/";
-var baseurl = "http://47.111.153.101:8081/";
+var baseurl = "http://localhost:8081/";
+//var baseurl = "http://47.111.153.101:8081/";
 function getQueryString(name) {
 	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
 	var r = window.location.search.substr(1).match(reg);

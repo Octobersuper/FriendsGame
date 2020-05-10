@@ -32,24 +32,24 @@ public class MahjongUtils {
         }
         if (lqd(userBean, brand)) {
             userBean.setPower(32);
-            userBean.setHu_type("豪华七小对");
+            userBean.setHu_type(userBean.getHu_type()+" 豪华七小对");
             System.err.println("豪华七小对");
         } else if (aqd(userBean, brand)) {// 暗七对
             userBean.setPower(16);
             System.err.println("七小对");
-            userBean.setHu_type("七小对");
+            userBean.setHu_type(userBean.getHu_type()+" 七小对");
         }else  if (pph(userBean,huType)) {
             userBean.setPower(8);
             System.err.println("飘胡");
-            userBean.setHu_type("飘胡");
+            userBean.setHu_type(userBean.getHu_type()+" 飘胡");
         }else if (kz(userBean, brand, tingList) || bz(userBean, brand, tingList) || dd(userBean,brand,tingList)) {
             userBean.setPower(4);
             System.err.println("夹胡");
-            userBean.setHu_type("夹胡");
+            userBean.setHu_type(userBean.getHu_type()+" 夹胡");
         }else {
             userBean.setPower(2);
             System.err.println("屁胡");
-            userBean.setHu_type("屁胡");
+            userBean.setHu_type(userBean.getHu_type()+" 屁胡");
         }
     }
 

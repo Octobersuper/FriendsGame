@@ -117,7 +117,7 @@ public class Mahjong_Socket {
      */
     @OnMessage
     public void onMessage(String message) {
-        //session.setMaxIdleTimeout(60000);
+        session.setMaxIdleTimeout(60000);
         returnMap.clear();
         if (!message.contains("heartbeat")) {
             System_Mess.system_Mess.ToMessagePrint(userBean.getBrands().size() + "接收" + userBean.getNickname() +
@@ -150,13 +150,13 @@ public class Mahjong_Socket {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     String format = sdf.format(new Date());
                     roomBean.setData(format);
-                    roomBean.getRoomBean_Custom("roomno-user_positions-fen-roomParams", returnMap,
+                    roomBean.getRoomBean_Custom("clubid-roomno-user_positions-fen-roomParams", returnMap,
                             "userid-nickname-avatarurl-number-money");
                     sendMessageTo(returnMap, roomBean);
                 }
             }
             sendMessageTo(returnMap);
-            room_change(roomBean, 3);
+            room_change(roomBean, 4);
         }
         // 加入房间
         if ("Matching".equals(jsonTo.get("type"))) {
@@ -171,14 +171,14 @@ public class Mahjong_Socket {
                 } else {
                     userBean.setReady_state(0);
                     // 将自己的信息推送给房间内其他玩家
-                    userBean.getUser_Custom("userid-nickname-avatarurl-number-log_lat", returnMap);
-                    roomBean.getRoomBean_Custom("user_positions", returnMap);
+                    userBean.getUser_Custom("money-userid-nickname-avatarurl-number-log_lat", returnMap);
+                    roomBean.getRoomBean_Custom("user_positions-clubid", returnMap);
                     returnMap.put("type", "Matching_User");
                     sendMessageTo(returnMap, roomBean);
                     returnMap.clear();
                     returnMap.put("state", "0");
                     returnMap.put("exittype", 1);
-                    roomBean.getRoomBean_Custom("roomno-max_person-user_positions-max_number-fen-roomParams" +
+                    roomBean.getRoomBean_Custom("clubid-roomno-max_person-user_positions-max_number-fen-roomParams" +
                                     "-user_log", returnMap,
                             "userid-nickname-avatarurl-ready_state-log_lat-number-money");
                 }
@@ -211,7 +211,7 @@ public class Mahjong_Socket {
                             int state = gameService.StartGame(roomBean);
                             if (state == 0) {
                                 roomBean.getRoomBean_Custom("game_number-max_number-brands_count-banker-brands-fen", returnMap,
-                                        "brands-number-userid");
+                                        "brands-number-userid-money");
                             }
                         }
                     } else {
@@ -263,7 +263,7 @@ public class Mahjong_Socket {
                 int state = gameService.StartGame(roomBean);
                 if (state == 0) {
                     roomBean.getRoomBean_Custom("game_number-max_number-brands_count-banker-brands-fen", returnMap,
-                            "brands-number-userid");
+                            "brands-number-userid-money");
                 }
                 Random random = new Random();
                 returnMap.put("dice", random.nextInt(12) + 2);
@@ -471,6 +471,7 @@ public class Mahjong_Socket {
                 if (Integer.parseInt(jsonTo.get("before_type")) == 1) {
                     userBean.setPower_number(userBean.getPower_number()*2);
                     userBean.getRecordMsgList().add("杠上炮*2");
+                    userBean.setHu_type(userBean.getHu_type()+" 杠上炮");
                 }
                 if(userBean.getZha()!=0){
                     userBean.setPower_number(userBean.getPower_number()*2);//扎针
@@ -480,7 +481,7 @@ public class Mahjong_Socket {
 
                 List<Integer> brandValue = mahjong_Util.User_Brand_Value(userBean.getBrands());
                 Collections.sort(brandValue);
-                brandValue.remove(Integer.parseInt(jsonTo.get("brand")));
+                brandValue.remove(Integer.valueOf(jsonTo.get("brand")));
                 brandValue.add(Integer.parseInt(jsonTo.get("brand")));
                 System.out.println(">>>>>>>牌型检测完成啦");
                 // 结算500=已经结算 501=等待别人胡牌操作 502=等待别人结算
@@ -491,7 +492,7 @@ public class Mahjong_Socket {
                 // 成功结算
                 if (state == 0) {
                     roomBean.getHu_user_list().clear();
-                    roomBean.getRoomBean_Custom("", returnMap, "userid-dqnumber-nickname-avatarurl-hu_type-ishu" +
+                    roomBean.getRoomBean_Custom("", returnMap, "money-userid-dqnumber-number-nickname-avatarurl-hu_type-ishu" +
                             "-power_number");
                     roomBean.setVictoryid(userBean.getUserid());
                     returnMap.put("type", "endhu");
@@ -544,6 +545,7 @@ public class Mahjong_Socket {
             if (before_type == 1) {
                 userBean.setPower_number(userBean.getPower_number()*2);
                 userBean.getRecordMsgList().add("杠上花*2");
+                userBean.setHu_type(userBean.getHu_type()+" 杠上花");
             }
             if(userBean.getZha()!=0){
                 userBean.setPower_number(userBean.getPower_number()*2);//扎针
@@ -552,7 +554,7 @@ public class Mahjong_Socket {
 
             List<Integer> brandValue = mahjong_Util.User_Brand_Value(userBean.getBrands());
             Collections.sort(brandValue);
-            brandValue.remove(Integer.parseInt(jsonTo.get("brand")));
+            brandValue.remove(Integer.valueOf(jsonTo.get("brand")));
             brandValue.add(Integer.parseInt(jsonTo.get("brand")));
             System.out.println(">>>>>>>牌型检测完成啦");
             // 自摸结算
@@ -561,7 +563,7 @@ public class Mahjong_Socket {
             System_Mess.system_Mess.ToMessagePrint("自摸状态" + state);
             if (state == 0) {
                 roomBean.getHu_user_list().clear();
-                roomBean.getRoomBean_Custom("", returnMap, "userid-dqnumber-nickname-avatarurl-hu_type-ishu" +
+                roomBean.getRoomBean_Custom("", returnMap, "money-userid-dqnumber-number-nickname-avatarurl-hu_type-ishu" +
                         "-power_number");
                 roomBean.setVictoryid(userBean.getUserid());
                 returnMap.put("type", "endhu");
@@ -621,6 +623,7 @@ public class Mahjong_Socket {
             int gang_brand = Integer.parseInt(jsonTo.get("brand"));
             userBean.setPower(2);
             userBean.getRecordMsgList().add("暗杠+2");
+            userBean.setHu_type(userBean.getHu_type()+" 暗杠");
             int[] brands = gameService.Hide_Bar(userBean, gang_brand, roomBean);
             returnMap.put("type", "hide_bar");
             returnMap.put("brands", brands);
@@ -635,6 +638,7 @@ public class Mahjong_Socket {
             int gang_brand = Integer.parseInt(jsonTo.get("brand"));
             userBean.setPower(1);
             userBean.getRecordMsgList().add("明杠+1");
+            userBean.setHu_type(userBean.getHu_type()+" 明杠");
             gameService.Show_Bar(userBean, Integer.parseInt(jsonTo.get("userid")), gang_brand, roomBean);
             returnMap.put("type", "show_bar");
             returnMap.put("userid", userBean.getUserid());
@@ -659,6 +663,7 @@ public class Mahjong_Socket {
             int brand_value = mahjong_Util.getBrand_Value(gang_brand);
             userBean.setPower(1);
             userBean.getRecordMsgList().add("明杠+1");
+            userBean.setHu_type(userBean.getHu_type()+" 补杠");
             roomBean.setRepair_baruserid(userBean.getUserid());
             gameService.Repair_Bar_Bump(userBean, gang_brand, roomBean);
             returnMap.put("type", "repair_bar_bump");
@@ -861,7 +866,7 @@ public class Mahjong_Socket {
                 sendMessageTo(returnMap, roomBean);
                 // 查询出房间信息返回
                 roomBean.getRoomBean_Custom(
-                        "cannon-dice-exit_game-end_userid-roomno-user_positions-brands_count-fen-fan-money-banker" +
+                        "clubid-cannon-dice-exit_game-end_userid-roomno-user_positions-brands_count-fen-fan-money-banker" +
                                 "-game_number-max_number-max_person-state-end_userid-game_type-user_log",
                         returnMap,
                         "userid-nickname-avatarurl-brands-bump_brands-show_brands-ishu-hide_brands-out_brands-log_lat" +
@@ -877,19 +882,25 @@ public class Mahjong_Socket {
         returnMap.clear();
         returnMap.put("type","room_change");
         returnMap.put("change_type",type);
-        room.getRoomBean_Custom2("avatarurl",returnMap,"roomno-game_number");
+        room.getRoomBean_Custom2("avatarurl",returnMap,"roomno-game_number-fen-max_number");
 
         if(room.getNumber_3()!=0){//证明是俱乐部房间
             for(Map.Entry<String, Mahjong_Socket> entry : Public_State.clients.entrySet()){
                 Mahjong_Socket ws = entry.getValue();
-                if (ws.userBean.getUserid()==userBean.getUserid())continue;
-                if(ws.userBean.getDttype().equals("0")){//查询全部
-                    if(ws.userBean.getNumber_3()==room.getNumber_3()&&Public_State.noRoom(ws.userBean)){//证明在同一个俱乐部
-                        ws.sendMessageTo(returnMap,ws.userBean.getOpenid());
-                    }
-                }else{//查询相同底分的
-                    if(ws.userBean.getNumber_3()==room.getNumber_3() && Integer.valueOf(ws.userBean.getDttype()) == room.getFen() &&Public_State.noRoom(ws.userBean)){//证明在同一个俱乐部
-                        ws.sendMessageTo(returnMap,ws.userBean.getOpenid());
+                if(type!=4){
+                    if (ws.userBean.getUserid()==userBean.getUserid())continue;
+                }else{
+                    returnMap.put("change_type",type-1);
+                }
+                if(ws.userBean.getDttype()!=null) {//查询全部
+                    if(ws.userBean.getDttype().equals("0")){//查询全部
+                        if(ws.userBean.getNumber_3()==room.getNumber_3()&&Public_State.noRoom(ws.userBean)){//证明在同一个俱乐部
+                            ws.sendMessageTo(returnMap,ws.userBean.getOpenid());
+                        }
+                    }else{//查询相同底分的
+                        if(ws.userBean.getNumber_3()==room.getNumber_3() && Integer.valueOf(ws.userBean.getDttype()) == room.getFen() &&Public_State.noRoom(ws.userBean)){//证明在同一个俱乐部
+                            ws.sendMessageTo(returnMap,ws.userBean.getOpenid());
+                        }
                     }
                 }
             }
@@ -897,10 +908,12 @@ public class Mahjong_Socket {
             for(Map.Entry<String, Mahjong_Socket> entry : Public_State.clients.entrySet()){
                 Mahjong_Socket ws = entry.getValue();
                 if (ws.userBean.getUserid()==userBean.getUserid())continue;
-                String renshu = ws.userBean.getDttype();
-                if(renshu!=null){
-                    if(Integer.valueOf(renshu) == room.getMax_person() &&Public_State.noRoom(ws.userBean)){//证明在同一个俱乐部
-                        ws.sendMessageTo(returnMap,ws.userBean.getOpenid());
+                if(ws.userBean.getDttype()!=null){
+                    String renshu = ws.userBean.getDttype();
+                    if(renshu!=null){
+                        if(Integer.valueOf(renshu) == room.getMax_person() &&Public_State.noRoom(ws.userBean)){//证明在同一个俱乐部
+                            ws.sendMessageTo(returnMap,ws.userBean.getOpenid());
+                        }
                     }
                 }
             }

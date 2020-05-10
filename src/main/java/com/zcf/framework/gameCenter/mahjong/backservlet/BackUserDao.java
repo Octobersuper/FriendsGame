@@ -2460,4 +2460,56 @@ public class BackUserDao {
 		}
 		return 0;
 	}
+
+	/**
+	 * 金币充值
+	 *
+	 * param userid
+	 * param money
+	 * param nickname
+	 * param zuserid
+	 * @return
+	 */
+	public Object upmoney(String userid, String money, String zuserid, String nickname) {
+		String sql = "UPDATE user_table SET money=money+?  where userid=?";
+		String str = baseDao.executeUpdate(sql, new Object[] { money, userid });
+		if ("success".equals(str)) {
+			insertmoney(money, zuserid, 4);
+			return "success";
+		}
+		return -1;
+	}
+
+	/**
+	 * 金币提现
+	 *
+	 * param userid
+	 * param money
+	 * param nickname
+	 * param zuserid
+	 * @return
+	 */
+	public Object downmoney(String userid, String money, String zuserid, String nickname) {
+		String sql = "UPDATE user_table SET money=money-?  where userid=? and money - ? >0";
+		String str = baseDao.executeUpdate(sql, new Object[] { money, userid, money });
+		if ("success".equals(str)) {
+			insertmoney(money, zuserid, 4);
+			return "success";
+		}
+		return -1;
+	}
+
+	/**
+	 * 修改金币商品
+	 *
+	 * param id
+	 * param i
+	 * param string2
+	 * param moneyname
+	 * @return
+	 */
+	public Object updmoney(int id, String moneyname, String realvalue, int price) {
+		String sql = "update game_money_shop SET moneyname=?,realvalue=?,price=? where moneyid=?";
+		return baseDao.executeUpdate(sql, new Object[] { moneyname, realvalue, price, id });
+	}
 }

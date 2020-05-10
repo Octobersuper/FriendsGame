@@ -43,6 +43,10 @@
 			<script type="text/html" id="barDemo">
 				<a class="layui-btn layui-btn-xs  layui-btn-primary" lay-event="current">查看</a>
 			</script>
+			<script type="text/html" id="barDemo4">
+				<a class="layui-btn layui-btn-xs" lay-event="updatemoney">增加</a>
+				<a class="layui-btn layui-btn-xs" lay-event="withdrawmoney">减少</a>
+			</script>
 			<script type="text/html" id="barDemo1">
 				<a class="layui-btn layui-btn-xs" lay-event="updatediamond">增加</a>
 				<a class="layui-btn  layui-btn-xs  layui-btn-normal" lay-event="withdrawdiamond">减少</a>
@@ -115,6 +119,10 @@
 											title : '房卡(单位/个)',
 											width : 115
 										}, {
+                                            field : 'money',
+                                            title : '金币 (单位/个)',
+                                            width : 120
+                                        }, {
 											field : 'date',
 											title : '注册日期',
 											width : 160
@@ -144,7 +152,12 @@
 											width : 85,
 											align : 'center',
 											toolbar : '#barDemo'
-										},{
+										}, {
+                                            title : '金币充值',
+                                            width : 112,
+                                            align : 'center',
+                                            toolbar : '#barDemo4'
+                                        },{
 											title : '房卡管理',
 											width : 112,
 											align : 'center',
@@ -305,7 +318,37 @@
 											area : [ '550px', '700px' ],
 											content : 'gamerecord.html?zuserid=' + zuserid
 										});
-									}
+									} else if (layEvent === 'updatemoney') {
+                                        var userid = data.userid;
+                                        var nickname = data.nickname;
+                                        var zuserid = data.zuserid;
+                                        localStorage.setItem("zuserid", zuserid)
+                                        localStorage.setItem("userid", userid)
+                                        localStorage.setItem("nickname", nickname)
+                                        layer.open({
+                                            type : 2,
+                                            title : '金币充值',
+                                            maxmin : true,
+                                            shadeClose : false, //点击遮罩关闭层
+                                            area : [ '600px', '300px' ],
+                                            content : 'updatemoney.html?userid=' + userid
+                                        });
+                                    } else if (layEvent === 'withdrawmoney') {
+                                        var userid = data.userid;
+                                        var nickname = data.nickname;
+                                        var zuserid = data.zuserid;
+                                        localStorage.setItem("zuserid", zuserid)
+                                        localStorage.setItem("userid", userid)
+                                        localStorage.setItem("nickname", nickname)
+                                        layer.open({
+                                            type : 2,
+                                            title : '提现',
+                                            maxmin : true,
+                                            shadeClose : false, //点击遮罩关闭层
+                                            area : [ '600px', '300px' ],
+                                            content : 'updatemoneys.html?userid=' + userid
+                                        });
+                                    }
 								});
 							});
 						}

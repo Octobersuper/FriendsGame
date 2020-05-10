@@ -2,6 +2,7 @@ package com.zcf.framework.gameCenter.mahjong.backservlet;
 
 import com.google.gson.Gson;
 import com.zcf.framework.gameCenter.mahjong.dao.M_GameDao;
+import com.zcf.framework.gameCenter.mahjong.dao.Mg_GameDao;
 import com.zcf.framework.gameCenter.mahjong.mahjong.Public_State;
 import org.apache.commons.lang3.StringUtils;
 import util.BaseDao;
@@ -386,6 +387,17 @@ public class BackUserServlet extends HttpServlet {
 						request.getParameter("diamond"), request.getParameter("zuserid")));
 		}
 
+		// 充值金币
+		if ("updatemoney".equals(type)) {
+			returnMap.put("status", backUserDao.upmoney(request.getParameter("userid"), request.getParameter("money"),
+					request.getParameter("zuserid"), request.getParameter("nickname")));
+		}
+		// 提现金币
+		if ("downmoney".equals(type)) {
+			returnMap.put("status", backUserDao.downmoney(request.getParameter("userid"), request.getParameter("money"),
+					request.getParameter("zuserid"), request.getParameter("nickname")));
+		}
+
 		// 查看充值提现记录
 		if ("getrechargerecord".equals(type)) {
 			String pageNum = request.getParameter("pageNum");
@@ -444,6 +456,22 @@ public class BackUserServlet extends HttpServlet {
 					backUserDao.deldiamond(Integer.parseInt(request.getParameter("diamondid")),
 							request.getParameter("diamondname"), request.getParameter("realvalue"),
 							Integer.parseInt(request.getParameter("price"))));
+		}
+
+		if ("getmoneyshop".equals(type)) {
+			returnMap.put("list", backUserDao.getmoneyshop(request.getParameter("backuserid")));
+		}
+		// 修改金币商品
+		if ("updmoney".equals(type)) {
+			returnMap.put("state",
+					backUserDao.updmoney(Integer.parseInt(request.getParameter("moneyid")),
+							request.getParameter("moneyname"), request.getParameter("realvalue"),
+							Integer.parseInt(request.getParameter("price"))));
+			BaseDao baseDao = new BaseDao();
+			Mg_GameDao asd = new Mg_GameDao(baseDao);
+			asd.getConfig();
+			//读取配置
+			baseDao.CloseAll();
 		}
 
 		/************************************* 房间管理 **************************************************/

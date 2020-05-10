@@ -144,6 +144,7 @@ public class F_WebSocket {
      */
     @OnMessage
     public void onMessage(String message) {
+        session.setMaxIdleTimeout(60000);
         returnMap.clear();
         // 解密
         // message = RC4.decry_RC4(message);
@@ -152,6 +153,11 @@ public class F_WebSocket {
         }.getType());
         returnMap.put("game_type", 1);
         // 创建房间
+        // 心跳连接
+        if ("heartbeat".equals(jsonTo.get("type"))) {
+            returnMap.put("type", "heartbeat");
+            sendMessageTo(returnMap);
+        }
         if ("Establish".equals(jsonTo.get("type"))) {
             returnMap.put("type", "Establish");
             returnMap.put("state", "0");

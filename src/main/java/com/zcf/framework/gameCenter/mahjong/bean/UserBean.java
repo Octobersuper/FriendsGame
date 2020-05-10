@@ -55,7 +55,7 @@ public class UserBean {
 	// 胡牌状态（server）
 	private int hu_state;
 	// 胡牌类型
-	private String hu_type;
+	private String hu_type = "";
 	// ishu（client）
 	private int is_hustate;
 	// lock锁

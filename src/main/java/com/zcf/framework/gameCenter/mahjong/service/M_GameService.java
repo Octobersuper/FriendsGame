@@ -329,6 +329,13 @@ public class M_GameService {
                 // 扣除失败者分数
                 user.setNumber(user.getNumber() - fen - fufen);
                 user.setDqnumber(-fen + user.getDqnumber() - fufen);
+                if(roomBean.getClubid()==0){//金币房间  需要扣除金币
+                    userBean.setMoney(userBean.getMoney()+fen+fufen);
+                    gameDao.UpdateUserMoney(userBean.getUserid(),fen+fufen,1);
+
+                    user.setMoney(user.getMoney()- fen+fufen);
+                    gameDao.UpdateUserMoney(user.getUserid(),fen+fufen,0);
+                }
             }
         }
         return EndGame(roomBean, userBean);
