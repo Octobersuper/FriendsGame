@@ -137,7 +137,7 @@ public class Mahjong_Socket {
             returnMap.put("type", "Establish");
             returnMap.put("exittype", 0);
             returnMap.put("state", "0");
-            if (roomBean != null && Public_State.PKMap.get(roomBean.getRoomno()) != null) {
+            if (roomBean != null && Public_State.PKMap.get(roomBean.getRoomno()) != null &&Integer.parseInt(jsonTo.get("clubid"))==0 ) {
                 // 重复创建
                 returnMap.put("state", "106");
             } else {
@@ -850,6 +850,7 @@ public class Mahjong_Socket {
             returnMap.put("userid", userBean.getUserid());
             returnMap.put("text", jsonTo.get("text"));
             sendMessageTo(returnMap, roomBean);
+            sendMessageTo(returnMap);
         }
         // 断线重连
         if ("end_wifi".equals(jsonTo.get("type"))) {
