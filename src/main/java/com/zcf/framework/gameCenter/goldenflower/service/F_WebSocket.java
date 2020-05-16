@@ -155,6 +155,7 @@ public class F_WebSocket {
         // 创建房间
         // 心跳连接
         if ("heartbeat".equals(jsonTo.get("type"))) {
+            returnMap.put("state", "0");
             returnMap.put("type", "heartbeat");
             sendMessageTo(returnMap);
         }

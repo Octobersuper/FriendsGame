@@ -712,8 +712,6 @@ public class M_GameService {
             // 第一次发起
             if (roomBean.getExit_game() == 0) {
                 roomBean.setExit_game(1);
-                //開啟解散倒計時
-                //roomBean.getExit_time().start();
                 roomBean.getLock().unlock();
                 // 发起解散
                 return 301;
@@ -728,7 +726,6 @@ public class M_GameService {
                 }
             }
             roomBean.getLock().unlock();
-            roomBean.setExit_game(0);
             return 304;
         }
     }

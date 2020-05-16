@@ -137,6 +137,7 @@ public class Mahjong_Socket {
             returnMap.put("type", "Establish");
             returnMap.put("exittype", 0);
             returnMap.put("state", "0");
+            userBean.setExit_game(0);
             if (roomBean != null && Public_State.PKMap.get(roomBean.getRoomno()) != null &&Integer.parseInt(jsonTo.get("clubid"))==0 ) {
                 // 重复创建
                 returnMap.put("state", "106");
@@ -163,6 +164,7 @@ public class Mahjong_Socket {
             returnMap.put("state", "0");
             // 经纬度
             userBean.setLog_lat(jsonTo.get("log_lat"));
+            userBean.setExit_game(0);
             int state = gameService.ISMatching_Money(userBean, jsonTo.get("roomno"));
             if (state == 0) {
                 roomBean = gameService.Matching(jsonTo, userBean);
