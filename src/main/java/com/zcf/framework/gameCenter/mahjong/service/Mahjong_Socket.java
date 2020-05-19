@@ -151,7 +151,7 @@ public class Mahjong_Socket {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     String format = sdf.format(new Date());
                     roomBean.setData(format);
-                    roomBean.getRoomBean_Custom("clubid-roomno-user_positions-fen-roomParams", returnMap,
+                    roomBean.getRoomBean_Custom("clubid-roomno-user_positions-fen-roomParams-sex", returnMap,
                             "userid-nickname-avatarurl-number-money");
                     sendMessageTo(returnMap, roomBean);
                 }
@@ -180,7 +180,7 @@ public class Mahjong_Socket {
                     returnMap.clear();
                     returnMap.put("state", "0");
                     returnMap.put("exittype", 1);
-                    roomBean.getRoomBean_Custom("clubid-roomno-max_person-user_positions-max_number-fen-roomParams" +
+                    roomBean.getRoomBean_Custom("clubid-roomno-max_person-user_positions-max_number-fen-roomParams-sex" +
                                     "-user_log", returnMap,
                             "userid-nickname-avatarurl-ready_state-log_lat-number-money");
                 }
@@ -248,13 +248,13 @@ public class Mahjong_Socket {
             }
             userBean.setZha(zha);
             userBean.setFu(fu);
-            //returnMap.put("state","0");
-            //returnMap.put("type","zha_fu");
-            //returnMap.put("userid",userBean.getUserid());
-            //returnMap.put("zha",jsonTo.get("zha"));
-            //returnMap.put("fu",fu);
-            //sendMessageTo(returnMap);
-            //sendMessageTo(returnMap,roomBean);
+            returnMap.put("state","0");
+            returnMap.put("type","zha_fu");
+            returnMap.put("userid",userBean.getUserid());
+            returnMap.put("zha",jsonTo.get("zha"));
+            returnMap.put("fu",fu);
+            sendMessageTo(returnMap);
+            sendMessageTo(returnMap,roomBean);
             returnMap.clear();
             roomBean.setZhanum(roomBean.getZhanum()+1);
             roomBean.getLock().unlock();
@@ -484,7 +484,7 @@ public class Mahjong_Socket {
                 List<Integer> brandValue = mahjong_Util.User_Brand_Value(userBean.getBrands());
                 Collections.sort(brandValue);
                 brandValue.remove(Integer.valueOf(jsonTo.get("brand")));
-                brandValue.add(Integer.parseInt(jsonTo.get("brand")));
+                brandValue.add(Integer.valueOf(jsonTo.get("brand")));
                 System.out.println(">>>>>>>牌型检测完成啦");
                 // 结算500=已经结算 501=等待别人胡牌操作 502=等待别人结算
                 int state = gameService.End_Game(userBean, roomBean, p_userid, 1);
@@ -557,7 +557,7 @@ public class Mahjong_Socket {
             List<Integer> brandValue = mahjong_Util.User_Brand_Value(userBean.getBrands());
             Collections.sort(brandValue);
             brandValue.remove(Integer.valueOf(jsonTo.get("brand")));
-            brandValue.add(Integer.parseInt(jsonTo.get("brand")));
+            brandValue.add(Integer.valueOf(jsonTo.get("brand")));
             System.out.println(">>>>>>>牌型检测完成啦");
             // 自摸结算
             int state = gameService.End_Game_This(userBean, roomBean);

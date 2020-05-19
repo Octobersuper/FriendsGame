@@ -290,6 +290,9 @@ public class RoomBean {
 			this.banker = this.game_userlist.get(index).getUserid();
         }else{
         	if(victoryid!=-1){
+        		if(this.banker==victoryid){
+        			game_number--;
+				}
 				//赢家坐庄
 				this.banker=victoryid;
 			}else{

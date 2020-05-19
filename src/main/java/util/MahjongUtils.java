@@ -38,7 +38,7 @@ public class MahjongUtils {
             userBean.setPower(16);
             System.err.println("七小对");
             userBean.setHu_type(userBean.getHu_type()+" 七小对");
-        }else  if (pph(userBean,huType)) {
+        }else  if (pph(userBean,huType) || ddp(userBean,huType)) {
             userBean.setPower(8);
             System.err.println("飘胡");
             userBean.setHu_type(userBean.getHu_type()+" 飘胡");
@@ -118,6 +118,55 @@ public class MahjongUtils {
                 return true;
             }
         }
+        return false;
+    }
+
+
+    /**
+     * 对对碰  点炮5分、自摸10分；
+     * @param userBean
+     * @param type
+     * @return
+     */
+    private boolean ddp(UserBean userBean, int type) {
+        List<Integer> userBrands = User_Brand_Value(userBean.getBrands());
+        Collections.sort(userBrands);
+
+            List<Integer> th = new ArrayList<>();
+            List<Integer> two = new ArrayList<>();
+            for (Integer card:userBrands) {
+                int t3 = 0;
+                for (Integer c:userBrands) {
+                    if(card.equals(c)){
+                        t3++;
+                    }
+                }
+                if (t3==3){
+                    th.add(card);
+                }else if(t3==2){
+                    two.add(card);
+                }else{
+                    return false;
+                }
+            }
+
+            //去重
+            List<Integer> newList = new ArrayList<>();
+            for (Integer ban : th) {
+                if (!newList.contains(ban)) {
+                    newList.add(ban);
+                }
+            }
+            //去重
+            List<Integer> two2 = new ArrayList<>();
+            for (Integer ban : two) {
+                if (!two2.contains(ban)) {
+                    two2.add(ban);
+                }
+            }
+            if(newList.size()==1&&two2.size()==1){
+                return true;
+            }
         return false;
     }
 

@@ -285,21 +285,34 @@ public class M_GameService {
             System.out.println("玩家" + user.getNickname() + "的番数为" + user.getPower_number());
             int fufen = 0;
             if (loser.getZha() != 0) {
+                loser.setPower_number(loser.getPower_number()*2);
                 fufen += roomBean.getFen();
+                if(user.getZha() == 0){
+                    user.setPower_number(user.getPower_number()*2-user.getFu());
+                }
             }
             if (loser.getFu() != 0) {
                 fufen += loser.getFu();
             }
-            int fen = user.getPower_number() + fufen;
+            int fen = user.getPower_number() + fufen -loser.getPower_number();
             user.setNumber(user.getNumber() + fen);
             user.setDqnumber(fen + user.getDqnumber());
             sum_num += fen;
+
+            //更新数据库分数
+            if(roomBean.getClubid()==0){//金币房间  需要扣除金币
+                user.setMoney(user.getMoney() + fen);
+                gameDao.UpdateUserMoney(user.getUserid(),fen,1);
+            }
         }
         // 扣除失败者分数
         loser.setNumber(loser.getNumber() - sum_num);
         loser.setDqnumber(-sum_num + loser.getDqnumber());
+        if(roomBean.getClubid()==0){//金币房间  需要扣除金币
+            loser.setMoney(loser.getMoney()-sum_num);
+            gameDao.UpdateUserMoney(loser.getUserid(),sum_num,0);
+        }
         roomBean.getLock().unlock();
-        //更新数据库分数
 
         return EndGame(roomBean, userBean);
     }
@@ -315,14 +328,21 @@ public class M_GameService {
         // 计算分数=房间底分*用户番数
         int fen = userBean.getPower_number();
         for (UserBean user : roomBean.getGame_userlist()) {
+            int i = 0;
             if (user.getUserid() != userBean.getUserid()) {
+                i++;
                 int fufen = 0;
                 if (user.getZha() != 0) {
+                    user.setPower_number(user.getPower_number()*2);
                     fufen += roomBean.getFen();
+                    if(userBean.getZha() == 0 && i ==1){
+                        fen += userBean.getPower_number()*2-userBean.getFu();
+                    }
                 }
                 if (user.getFu() != 0) {
                     fufen += user.getFu();
                 }
+                fufen  = fufen - user.getPower_number();
                 userBean.setNumber(fen + userBean.getNumber() +fufen);
                 userBean.setDqnumber(fen + userBean.getDqnumber() + fufen);
 
