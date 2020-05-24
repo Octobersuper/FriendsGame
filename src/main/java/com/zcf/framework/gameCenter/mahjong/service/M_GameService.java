@@ -280,14 +280,16 @@ public class M_GameService {
         // 正在结算
         //roomBean.setState(3);
         UserBean loser = roomBean.getUserBean(p_userid);//失败者
+        int i = 0;
         for (UserBean user : roomBean.getHu_user_list()) {
+            i++;
             // 计算分数=房间底分*用户番数
             System.out.println("玩家" + user.getNickname() + "的番数为" + user.getPower_number());
             int fufen = 0;
             if (loser.getZha() != 0) {
-                loser.setPower_number(loser.getPower_number()*2);
+                loser.setPower_number(loser.getPower_number()*2*roomBean.getFen());
                 fufen += roomBean.getFen();
-                if(user.getZha() == 0){
+                if(user.getZha() == 0 && i == 1){
                     user.setPower_number(user.getPower_number()*2-user.getFu());
                 }
             }
@@ -333,7 +335,7 @@ public class M_GameService {
                 i++;
                 int fufen = 0;
                 if (user.getZha() != 0) {
-                    user.setPower_number(user.getPower_number()*2);
+                    user.setPower_number(user.getPower_number()*2*roomBean.getFen());
                     fufen += roomBean.getFen();
                     if(userBean.getZha() == 0 && i ==1){
                         fen += userBean.getPower_number()*2-userBean.getFu();

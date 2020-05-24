@@ -151,8 +151,8 @@ public class Mahjong_Socket {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     String format = sdf.format(new Date());
                     roomBean.setData(format);
-                    roomBean.getRoomBean_Custom("clubid-roomno-user_positions-fen-roomParams-sex", returnMap,
-                            "userid-nickname-avatarurl-number-money");
+                    roomBean.getRoomBean_Custom("clubid-roomno-user_positions-fen-roomParams", returnMap,
+                            "userid-nickname-avatarurl-number-money-sex");
                     sendMessageTo(returnMap, roomBean);
                 }
             }
@@ -173,16 +173,16 @@ public class Mahjong_Socket {
                 } else {
                     userBean.setReady_state(0);
                     // 将自己的信息推送给房间内其他玩家
-                    userBean.getUser_Custom("money-userid-nickname-avatarurl-number-log_lat", returnMap);
+                    userBean.getUser_Custom("money-userid-nickname-avatarurl-number-log_lat-sex", returnMap);
                     roomBean.getRoomBean_Custom("user_positions-clubid", returnMap);
                     returnMap.put("type", "Matching_User");
                     sendMessageTo(returnMap, roomBean);
                     returnMap.clear();
                     returnMap.put("state", "0");
                     returnMap.put("exittype", 1);
-                    roomBean.getRoomBean_Custom("clubid-roomno-max_person-user_positions-max_number-fen-roomParams-sex" +
+                    roomBean.getRoomBean_Custom("clubid-roomno-max_person-user_positions-max_number-fen-roomParams" +
                                     "-user_log", returnMap,
-                            "userid-nickname-avatarurl-ready_state-log_lat-number-money");
+                            "userid-nickname-avatarurl-ready_state-log_lat-number-money-sex");
                 }
             } else {
                 // 100=房间不存在114=重复加入106=需要定位 123房卡不足

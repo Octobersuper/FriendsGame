@@ -700,7 +700,7 @@ public class RoomBean {
 			if (user_positions[2] == -1) {
 				user_positions[2] = userid;
 			}else{
-                user_positions[1] = userid;
+                user_positions[0] = userid;
             }
 		} else {
 			for (int i = 0; i < user_positions.length; i++) {
