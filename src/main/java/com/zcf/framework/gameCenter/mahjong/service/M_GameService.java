@@ -34,10 +34,12 @@ public class M_GameService {
         Integer paytype = 0;//Integer.valueOf(map.get("paytype"));//0房主  1AA
         // 创建房间所需房卡(2圈-4圈)
         int fangka;
-        if (Integer.parseInt(map.get("max_number")) == 8)
+        if (Integer.parseInt(map.get("fen")) == 1)
             fangka = 4;
-        else
+        else if (Integer.parseInt(map.get("fen")) == 2)
             fangka = 6;
+        else
+            fangka = 8;
 
         if (clubid == 0) {
             int money = gameDao.getUserMoney(userBean.getUserid());
@@ -290,8 +292,13 @@ public class M_GameService {
                 loser.setPower_number(loser.getPower_number()*2*roomBean.getFen());
                 fufen += roomBean.getFen();
                 if(user.getZha() == 0 && i == 1){
-                    user.setPower_number(user.getPower_number()*2-user.getFu());
+                    user.setPower_number(user.getPower_number()*2);
+                    if(userBean.getFu()!=0){
+                        user.setPower_number(user.getPower_number()-user.getFu());
+                    }
                 }
+            }else{
+                loser.setPower_number(loser.getPower_number()*roomBean.getFen());
             }
             if (loser.getFu() != 0) {
                 fufen += loser.getFu();
@@ -329,8 +336,8 @@ public class M_GameService {
     public int End_Game_This(UserBean userBean, RoomBean roomBean) {
         // 计算分数=房间底分*用户番数
         int fen = userBean.getPower_number();
+        int i = 0;
         for (UserBean user : roomBean.getGame_userlist()) {
-            int i = 0;
             if (user.getUserid() != userBean.getUserid()) {
                 i++;
                 int fufen = 0;
@@ -338,8 +345,13 @@ public class M_GameService {
                     user.setPower_number(user.getPower_number()*2*roomBean.getFen());
                     fufen += roomBean.getFen();
                     if(userBean.getZha() == 0 && i ==1){
-                        fen += userBean.getPower_number()*2-userBean.getFu();
+                        fen = userBean.getPower_number()*2;
+                        if(userBean.getFu()!=0){
+                            fen = fen - userBean.getFu();
+                        }
                     }
+                }else{
+                    user.setPower_number(user.getPower_number()*roomBean.getFen());
                 }
                 if (user.getFu() != 0) {
                     fufen += user.getFu();

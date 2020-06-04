@@ -171,7 +171,7 @@ public class Guangan_GameInterface extends HttpServlet {
 		if ("ckzuan".equals(type)) {
 			returnMap.put("type_s", type);
 			returnMap.put("ckzuan", gameDao.ckzuan());
-			returnMap.put("diamond", gameDao.getUserDiamond(Integer.parseInt(request.getParameter("userid"))));
+			//returnMap.put("diamond", gameDao.getUserDiamond(Integer.parseInt(request.getParameter("userid"))));
 			returnMap.put("state", "-1");
 		}
 

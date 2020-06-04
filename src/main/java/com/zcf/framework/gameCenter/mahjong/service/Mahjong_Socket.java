@@ -178,6 +178,8 @@ public class Mahjong_Socket {
                     returnMap.put("type", "Matching_User");
                     sendMessageTo(returnMap, roomBean);
                     returnMap.clear();
+
+
                     returnMap.put("state", "0");
                     returnMap.put("exittype", 1);
                     roomBean.getRoomBean_Custom("clubid-roomno-max_person-user_positions-max_number-fen-roomParams" +
@@ -191,6 +193,32 @@ public class Mahjong_Socket {
             returnMap.put("type", "Matching");
             sendMessageTo(returnMap);
             room_change(roomBean, 0);
+
+            if(state==0&&roomBean!=null){
+                //推位置
+                returnMap.put("type", "get_position");
+                List<String> list = new ArrayList<String>();
+                for (int i = 0; i < roomBean.getGame_userlist().size(); i++) {
+                    UserBean user = roomBean.getGame_userlist().get(i);
+                    for (int j = i + 1; j < roomBean.getGame_userlist().size(); j++) {
+                        UserBean user2 = roomBean.getGame_userlist().get(j);
+                        double distance = MapHelper.GetPointDistance(
+                                user.getLog_lat(), user2.getLog_lat());
+                        if(distance<1){
+                            String re = user.getUserid() + "-"
+                                    + user2.getUserid() + "-"
+                                    + String.valueOf(distance);
+                            list.add(re);
+                        }
+                    }
+                }
+                returnMap.put("list", list);
+                returnMap.put("position", roomBean.getUser_positions());
+                sendMessageTo(returnMap);
+                sendMessageTo(returnMap, roomBean);
+                returnMap.clear();
+
+            }
         }
         // 准备
         if ("ready".equals(jsonTo.get("type"))) {
@@ -465,8 +493,19 @@ public class Mahjong_Socket {
                 }
                 // 结算检测
                 MahjongUtils mahjongUtils = new MahjongUtils();
+                Integer maxCard = tingList.get(0);
+                int maxnum = -1;
+                for (Integer card:
+                     tingList) {
+                    int brand = mahjongUtils.getBrandKe_2(userBean, Integer.parseInt(jsonTo.get("brand")), card, 0);
+                    if(brand>maxnum){
+                        maxnum = brand;
+                        maxCard = card;
+                    }
+                }
+                tingList.clear();
+                tingList.add(maxCard);
                 mahjongUtils.getBrandKe(roomBean, userBean, Integer.parseInt(jsonTo.get("brand")), tingList, 0);
-
 
                 userBean.setPower_number(userBean.getPower_number()*roomBean.getFen());//几倍场
                 //是否杠上炮*2
@@ -499,7 +538,7 @@ public class Mahjong_Socket {
                     roomBean.setVictoryid(userBean.getUserid());
                     returnMap.put("type", "endhu");
                     returnMap.put("brands", brandValue);
-                    returnMap.put("is_last", roomBean.getGame_number() >= roomBean.getMax_number() ? 1 : 0);
+                    returnMap.put("is_last", roomBean.getGame_number() >= roomBean.getMax_number()&&roomBean.getBanker()!=roomBean.getVictoryid() ? 1 : 0);
                     sendMessageTo(returnMap);
                     sendMessageTo(returnMap, roomBean);
                     roomBean.addLog(returnMap);
@@ -538,6 +577,19 @@ public class Mahjong_Socket {
             }
             // 结算检测
             MahjongUtils mahjongUtils = new MahjongUtils();
+
+            Integer maxCard = tingList.get(0);
+            int maxnum = -1;
+            for (Integer card:
+                    tingList) {
+                int brand = mahjongUtils.getBrandKe_2(userBean, Integer.parseInt(jsonTo.get("brand")), card, 1);
+                if(brand>maxnum){
+                    maxnum = brand;
+                    maxCard = card;
+                }
+            }
+            tingList.clear();
+            tingList.add(maxCard);
             mahjongUtils.getBrandKe(roomBean, userBean, Integer.parseInt(jsonTo.get("brand")), tingList, 1);
 
 
@@ -570,7 +622,7 @@ public class Mahjong_Socket {
                 roomBean.setVictoryid(userBean.getUserid());
                 returnMap.put("type", "endhu");
                 returnMap.put("brands", brandValue);
-                returnMap.put("is_last", roomBean.getGame_number() >= roomBean.getMax_number() ? 1 : 0);
+                returnMap.put("is_last", roomBean.getGame_number() >= roomBean.getMax_number()&&roomBean.getBanker()!=roomBean.getVictoryid()  ? 1 : 0);
                 sendMessageTo(returnMap);
                 sendMessageTo(returnMap, roomBean);
                 roomBean.addLog(returnMap);
@@ -732,41 +784,6 @@ public class Mahjong_Socket {
                 }
                 Public_State.clients.get(user.getOpenid()).sendMessageTo(returnMap);
             }
-        }
-
-        // 获取位置距离
-        if ("get_position".equals(jsonTo.get("type"))) {
-            returnMap.put("type", "get_position");
-            if (roomBean.getGame_userlist().size() == 2) {
-                List<String> list = new ArrayList<String>();
-                double distance = MapHelper.GetPointDistance(roomBean
-                        .getGame_userlist().get(0).getLog_lat(), roomBean
-                        .getGame_userlist().get(1).getLog_lat());
-                String re = roomBean.getGame_userlist().get(0).getNickname()
-                        + "-" + roomBean.getGame_userlist().get(1).getNickname()
-                        + "-" + String.valueOf(distance);
-                list.add(String.valueOf(re));
-                returnMap.put("list", list);
-            } else if (roomBean.getGame_userlist().size() == 4) {
-                List<String> list = new ArrayList<String>();
-                for (int i = 0; i < roomBean.getGame_userlist().size(); i++) {
-                    UserBean user = roomBean.getGame_userlist().get(i);
-                    for (int j = i; j < roomBean.getGame_userlist().size(); j++) {
-                        UserBean user2 = roomBean.getGame_userlist().get(j);
-                        if (user.getUserid() != user2.getUserid()) {
-                            double distance = MapHelper.GetPointDistance(
-                                    user.getLog_lat(), user2.getLog_lat());
-                            String re = user.getNickname() + "-"
-                                    + user2.getNickname() + "-"
-                                    + String.valueOf(distance);
-                            list.add(re);
-                        }
-                    }
-                }
-                returnMap.put("list", list);
-            }
-            returnMap.put("position", roomBean.getUser_positions());
-            sendMessageTo(returnMap);
         }
 
         //查看所有房间

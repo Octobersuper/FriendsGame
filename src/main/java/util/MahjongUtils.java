@@ -3,6 +3,7 @@ package util;
 
 import com.zcf.framework.gameCenter.mahjong.bean.RoomBean;
 import com.zcf.framework.gameCenter.mahjong.bean.UserBean;
+import io.swagger.models.auth.In;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +43,7 @@ public class MahjongUtils {
             userBean.setPower(8);
             System.err.println("飘胡");
             userBean.setHu_type(userBean.getHu_type()+" 飘胡");
-        }else if (kz(userBean, brand, tingList) || bz(userBean, brand, tingList) || dd(userBean,brand,tingList)) {
+        }else if (kz(userBean, brand, tingList) /*|| bz(userBean, brand, tingList)*/ || dd(userBean,brand,tingList)) {
             userBean.setPower(4);
             System.err.println("夹胡");
             userBean.setHu_type(userBean.getHu_type()+" 夹胡");
@@ -51,6 +52,31 @@ public class MahjongUtils {
             System.err.println("屁胡");
             userBean.setHu_type(userBean.getHu_type()+" 屁胡");
         }
+    }
+
+
+    public int getBrandKe_2(UserBean userBean, Integer brand, Integer card, int huType) {
+        if (huType == 0) {
+            userBean.getBrands().add(brand);
+        }
+        ArrayList<Integer> tingList = new ArrayList<>();
+        tingList.add(card);
+        int i = 0;
+        if (lqd(userBean, brand)) {
+            i = 4;
+        } else if (aqd(userBean, brand)) {// 暗七对
+            i = 3;
+        }else  if (pph(userBean,huType) || ddp(userBean,huType)) {
+            i = 2;
+        }else if (kz(userBean, brand, tingList)/* || bz(userBean, brand, tingList) */|| dd(userBean,brand,tingList)) {
+            i = 1;
+        }else {
+            i = 0;
+        }
+        if (huType == 0) {
+            userBean.getBrands().remove(brand);
+        }
+        return i;
     }
 
     private boolean sb(UserBean userBean) {
@@ -1990,9 +2016,8 @@ public class MahjongUtils {
         }
         if (count == 2) {
             for (Integer i : tingList) {
-                if (i == brand_value && tingList.size() == 1) {
+                if (i == brand_value && userBean.getTingCards().size() == 1) {
                     return true;
-
                 }
             }
         }
@@ -2105,7 +2130,7 @@ public class MahjongUtils {
         list.add(brand_value - 1);
         if (userBrands.containsAll(list)) {
             for (Integer i : tingList) {
-                if (i == brand_value && tingList.size() == 1) {
+                if (i == brand_value && userBean.getTingCards().size() == 1) {
                     return true;
                 }
             }

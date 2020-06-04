@@ -224,6 +224,30 @@ public class F_WebSocket {
                 sendMessageTo(returnMap);
                 sendMessageTo(returnMap, pkBean);
                 //room_change(pkBean, 0);
+                    returnMap.clear();
+                    //推位置
+                    returnMap.put("type", "get_position");
+                    List<String> list = new ArrayList<String>();
+                    List<UserBean> game_userList = pkBean.getGame_userList(0);
+                    for (int i = 0; i < game_userList.size(); i++) {
+                        UserBean user = game_userList.get(i);
+                        for (int j = i + 1; j < game_userList.size(); j++) {
+                            UserBean user2 = game_userList.get(j);
+                            double distance = MapHelper.GetPointDistance(
+                                    user.getLog_lat(), user2.getLog_lat());
+                            if(distance<1){
+                                String re = user.getUserid() + "-"
+                                        + user2.getUserid() + "-"
+                                        + String.valueOf(distance);
+                                list.add(re);
+                            }
+                        }
+                    }
+                    returnMap.put("list", list);
+                    returnMap.put("position", pkBean.getUser_positions());
+                    sendMessageTo(returnMap);
+                    sendMessageTo(returnMap, pkBean);
+                    returnMap.clear();
             } else {
                 returnMap.put("type", "Sit_down");
                 returnMap.put("state", "131"); // 坐下失败
