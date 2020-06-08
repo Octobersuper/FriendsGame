@@ -43,7 +43,7 @@ public class MahjongUtils {
             userBean.setPower(8);
             System.err.println("飘胡");
             userBean.setHu_type(userBean.getHu_type()+" 飘胡");
-        }else if (kz(userBean, brand, tingList) /*|| bz(userBean, brand, tingList)*/ || dd(userBean,brand,tingList)) {
+        }else if (kz(userBean, brand, tingList) || dd(userBean,brand,tingList)) {
             userBean.setPower(4);
             System.err.println("夹胡");
             userBean.setHu_type(userBean.getHu_type()+" 夹胡");
@@ -68,7 +68,7 @@ public class MahjongUtils {
             i = 3;
         }else  if (pph(userBean,huType) || ddp(userBean,huType)) {
             i = 2;
-        }else if (kz(userBean, brand, tingList)/* || bz(userBean, brand, tingList) */|| dd(userBean,brand,tingList)) {
+        }else if (kz(userBean, brand, tingList)/* || bz(userBean, brand, tingList) */ || dd(userBean,brand,tingList)) {
             i = 1;
         }else {
             i = 0;
@@ -2006,6 +2006,20 @@ public class MahjongUtils {
         List<Integer> userBrands = User_Brand_Value(userBean.getBrands());
         //单张牌值转换
         int brand_value = getBrand_Value(brand);
+
+        ArrayList<Integer> list = new ArrayList<>();
+        list.add(brand_value);
+        list.add(brand_value-1);
+        if(userBrands.containsAll(list)){
+            return false;
+        }
+        list.clear();
+        list.add(brand_value);
+        list.add(brand_value+1);
+        if(userBrands.containsAll(list)){
+            return false;
+        }
+
         //userBrands.add(brand_value);
         Collections.sort(userBrands);
         int count = 0;
@@ -2130,9 +2144,28 @@ public class MahjongUtils {
         list.add(brand_value - 1);
         if (userBrands.containsAll(list)) {
             for (Integer i : tingList) {
-                if (i == brand_value && userBean.getTingCards().size() == 1) {
+                if (i == brand_value/* && userBean.getTingCards().size() == 1*/) {
                     return true;
                 }
+            }
+        }
+        //特殊牌型 12胡3  89胡7
+        if(brand_value==2 || brand_value == 11  || brand_value == 18){
+            list.clear();
+            list.add(brand_value);
+            list.add(brand_value - 1);
+            list.add(brand_value - 1);
+            if (userBrands.containsAll(list)) {
+                return true;
+            }
+        }
+        if(brand_value==6 || brand_value == 15 || brand_value == 24){
+            list.clear();
+            list.add(brand_value);
+            list.add(brand_value + 1);
+            list.add(brand_value + 1);
+            if (userBrands.containsAll(list)) {
+                return true;
             }
         }
         return false;

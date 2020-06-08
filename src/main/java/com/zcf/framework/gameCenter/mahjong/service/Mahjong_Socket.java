@@ -493,7 +493,7 @@ public class Mahjong_Socket {
                 }
                 // 结算检测
                 MahjongUtils mahjongUtils = new MahjongUtils();
-                Integer maxCard = tingList.get(0);
+                /*Integer maxCard = tingList.get(0);
                 int maxnum = -1;
                 for (Integer card:
                      tingList) {
@@ -504,7 +504,7 @@ public class Mahjong_Socket {
                     }
                 }
                 tingList.clear();
-                tingList.add(maxCard);
+                tingList.add(maxCard);*/
                 mahjongUtils.getBrandKe(roomBean, userBean, Integer.parseInt(jsonTo.get("brand")), tingList, 0);
 
                 userBean.setPower_number(userBean.getPower_number()*roomBean.getFen());//几倍场
@@ -578,7 +578,7 @@ public class Mahjong_Socket {
             // 结算检测
             MahjongUtils mahjongUtils = new MahjongUtils();
 
-            Integer maxCard = tingList.get(0);
+            /*Integer maxCard = tingList.get(0);
             int maxnum = -1;
             for (Integer card:
                     tingList) {
@@ -589,7 +589,7 @@ public class Mahjong_Socket {
                 }
             }
             tingList.clear();
-            tingList.add(maxCard);
+            tingList.add(maxCard);*/
             mahjongUtils.getBrandKe(roomBean, userBean, Integer.parseInt(jsonTo.get("brand")), tingList, 1);
 
 
@@ -982,7 +982,8 @@ public class Mahjong_Socket {
             returnMap.put("type", "exit_all");
             sendMessageTo(returnMap);
             sendMessageTo(returnMap, roomBean);
-            Public_State.PKMap.remove(roomBean.getRoomno());
+            if (roomBean.getClubid()==0)
+                Public_State.PKMap.remove(roomBean.getRoomno());
             room_change(roomBean, 3);
         }
         roomBean = null;
